@@ -286,6 +286,10 @@
         }
   })()
 
+  var emit = (function () {
+    return window.addEventListener ? 1 : 2
+  })()
+
   var off = (function () {
     return window.removeEventListener
       ? function (node, fn) {
@@ -332,6 +336,37 @@
   //
   // 虚拟节点
   //
+  function setUid(node, uid) {
+    if (node.nodeType == 1) {
+      node.uid = uid
+      SHOW.uid && node.setAttribute("uid", uid) // @dev
+    } else if (node.nodeType == 3) {
+      if (canSetUidOnTextNode) {
+        node.uid = uid
+      } else {
+        // ie
+        // save on parentNode
+        var parentNode = node.parentNode
+        var map = parentNode.uidNodeMap || (parentNode.uidNodeMap = {})
+        map[uid] = node
+      }
+    }
+  }
+  function getUid(node) {
+    if (node.nodeType == 1) {
+      return node.uid
+    } else if (node.nodeType == 3) {
+      if (canSetUidOnTextNode) {
+        return node.uid
+      }
+      var map = node.parentNode.uidNodeMap
+      for (var uid in map) {
+        if (map[uid] == node) {
+          return uid
+        }
+      }
+    }
+  }
   function VNode(node, cloneUid) {
     // VNode(node) -> new VNode(node)
     if (!(this instanceof VNode)) return new VNode(node, cloneUid)
@@ -364,37 +399,8 @@
   }
   extend(VNode, {
     map: {}, // uid.key.path: node
-    setUid: function (node, uid) {
-      if (node.nodeType == 1) {
-        node.uid = uid
-        SHOW.uid && node.setAttribute("uid", uid) // @dev
-      } else if (node.nodeType == 3) {
-        if (canSetUidOnTextNode) {
-          node.uid = uid
-        } else {
-          // ie
-          // save on parentNode
-          var parentNode = node.parentNode
-          var map = parentNode.uidNodeMap || (parentNode.uidNodeMap = {})
-          map[uid] = node
-        }
-      }
-    },
-    getUid: function (node) {
-      if (node.nodeType == 1) {
-        return node.uid
-      } else if (node.nodeType == 3) {
-        if (canSetUidOnTextNode) {
-          return node.uid
-        }
-        var map = node.parentNode.uidNodeMap
-        for (var uid in map) {
-          if (map[uid] == node) {
-            return uid
-          }
-        }
-      }
-    },
+    setUid: setUid,
+    getUid: getUid,
     getAttrs: function (node) {
       var attrs = {}
       forEach(node.attributes, function (attribute) {
@@ -751,6 +757,7 @@
       var handler = this.eventMap[key]
       // 保存||更新 handler
       this.eventMap[key] = fn //旧的fn有旧的闭包
+
       if (handler) return
 
       // 首次注册
@@ -1093,9 +1100,92 @@
     el && this.$mount(el)
   }
   VM.prototype = {
-    $on: function () {},
-    $emit: function () {},
-    $off: function () {},
+    $on: function (event, fn, ctx) {
+      if (typeof fn !== "function") {
+        console.error("listener must be a function")
+        return
+      }
+
+      var eventStores = VM.eventStores
+      eventStores[event] = eventStores[event] || []
+      eventStores[event].push({
+        cb: fn,
+        ctx: ctx || this,
+      })
+    },
+    $emit: function (event, arg) {
+      var self = this
+      function globalEmit() {
+        var eventStores = VM.eventStores
+        let store = eventStores[event]
+        let args
+
+        if (store) {
+          store = store.slice(0)
+          args = [].slice.call(arguments, 1)
+          args[0] = {
+            eventCode: event,
+            data: args[0],
+          }
+          for (let i = 0, len = store.length; i < len; i++) {
+            store[i].cb.apply(store[i].ctx, args)
+          }
+        }
+      }
+      function VNodeEmit() {
+        var tm = 0
+        var vnodeUid = getUid(self.$el)
+        var VNode = self.$VN(vnodeUid)
+        var eventMap = VNode.eventMap
+
+        // 补偿一次事件调用
+        // 主要是补偿mounted时 VNode.eventMap还无法获取问题
+        function VNodEvent() {
+          eventMap = VNode.eventMap
+          var eventCallback = eventMap[event]
+          console.log(eventMap, 'eventMap')
+          eventCallback && eventCallback.call(VNode, arg)
+        }
+        if (!eventMap) {
+          clearTimeout(tm)
+          tm = setTimeout(function () {
+            VNodEvent()
+          }, 100)
+        } else {
+          VNodEvent()
+        }
+      }
+      VNodeEmit()
+    },
+    $off: function (event, fn) {
+      var eventStores = VM.eventStores
+
+      // all
+      if (!arguments.length) {
+        eventStores = {}
+        return
+      }
+
+      // specific event
+      const store = eventStores[event]
+      if (!store) return
+
+      // remove all handlers
+      if (arguments.length === 1) {
+        delete eventStores[event]
+        return
+      }
+
+      // remove specific handler
+      let cb
+      for (let i = 0, len = store.length; i < len; i++) {
+        cb = store[i].cb
+        if (cb === fn) {
+          store.splice(i, 1)
+          break
+        }
+      }
+    },
     $offAll: function () {},
     $once: function () {},
     $mount: function (el) {
@@ -1108,6 +1198,7 @@
     },
   }
   extend(VM, {
+    eventStores: {},
     compile: function (node) {
       /*
             VNode(uid).if(bool, function(){
@@ -1345,7 +1436,9 @@
         }
       }
 
-      var render = Function("var $THISVM=this;with(this){\n" + code + "\n}")
+      var render = Function(
+        "var $THISVM=this;this.abc = 1;with(this){\n" + code + "\n}"
+      )
       return render
     },
     injectFunction: function (vm, fn) {

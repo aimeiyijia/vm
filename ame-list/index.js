@@ -8,7 +8,7 @@
   }
 })(typeof self !== "undefined" ? self : this, function () {
   function getListBaseTemplate() {
-    const template = `<div>主体 {{ data }} {{ testProp.a }} </div>`
+    const template = `<div @click="handleTestEmit">主体 {{ data }} {{ testProp.a }} </div>`
     Ame.component("list-base", {
       props: {
         testProp: Object,
@@ -16,17 +16,25 @@
       template: template,
       data: function () {
         return {
-          data: '我是listBase数据',
+          data: "我是listBase数据",
         }
       },
       mounted: function () {
         JSON.stringify
         console.log(this, "list-base 组件")
+        // console.log(this.$VN('2'), "this.$VN 组件")
         // setInterval(() => {
         //   this.data = [new Date()]
         //   console.log('改变data')
         // }, 2000)
+        this.$emit("test-event")
       },
+      methods: {
+        handleTestEmit: function(){
+          console.log('节点')
+          this.$emit("test-event")
+        }
+      }
     })
   }
   function getListHeaderTemplate() {
@@ -39,7 +47,7 @@
     getListBaseTemplate()
     const template = `
       <input v-model="model"> {{model}}
-      <list-base :test-prop="testProps" :ab="testProps"></list-base>
+      <list-base :test-prop="testProps" :ab="testProps" @test-event="handleTestEvent"></list-base>
     `
     $("#app").append(template)
     const instance = new Ame({
@@ -58,8 +66,12 @@
         //   console.log(this, "改变data")
         // }, 1000)
       },
+      methods: {
+        handleTestEvent() {
+          console.log("自定义事件被触发")
+        },
+      },
     })
-    
   }
   return {
     init,
