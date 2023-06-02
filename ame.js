@@ -18,7 +18,7 @@
     }
   })(0)
 
-  //a-b to aB
+  //a-b => aB
   function hyphenToCamelCase(str) {
     if (typeof str !== "string") {
       throw new TypeError("Argument must be a string")
@@ -26,6 +26,18 @@
     return str.replace(/-([a-z])/g, function (match, p1) {
       return String.fromCharCode(p1.charCodeAt(0) - 32)
     })
+  }
+
+  // aB => a-b
+  function camelCaseToHyphen(str) {
+    if (typeof str !== "string") {
+      throw new Error("Parameter must be a string")
+    }
+    return str
+      .replace(/[A-Z]/g, function (match) {
+        return "-" + match.toLowerCase()
+      })
+      .replace(/^-/, "")
   }
 
   function hasOwn(obj, property) {
@@ -530,6 +542,7 @@
       // vnode change?
       if (propertys[name] === value && name in propertys) return value
 
+      // 短横线转为驼峰命名
       name = hyphenToCamelCase(name)
       return (propertys[name] = this.node[name] = value)
     },
@@ -949,7 +962,6 @@
 
       var vcomponent = vis.vcomponent
       var component = vcomponent.component
-
       // props
       extend(component, vis.propertys)
       // render
@@ -980,12 +992,12 @@
     // init props
     var props = options.props
     if (props) {
+      var propsObj = {}
       for (var propKey in props) {
         var propType = props[propKey]
-        VM.setData(this, {
-          [propKey]: propType(),
-        })
+        propsObj[propKey] = propType()
       }
+      VM.setData(this, propsObj)
     }
 
     // methods
@@ -1081,6 +1093,11 @@
     el && this.$mount(el)
   }
   VM.prototype = {
+    $on: function () {},
+    $emit: function () {},
+    $off: function () {},
+    $offAll: function () {},
+    $once: function () {},
     $mount: function (el) {
       // mount
       el.parentNode.replaceChild(this.$el, el)

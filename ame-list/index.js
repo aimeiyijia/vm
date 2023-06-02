@@ -8,7 +8,7 @@
   }
 })(typeof self !== "undefined" ? self : this, function () {
   function getListBaseTemplate() {
-    const template = `<div>主体 {{ data }} {{ testProp.a }}</div>`
+    const template = `<div>主体 {{ data }} {{ testProp.a }} </div>`
     Ame.component("list-base", {
       props: {
         testProp: Object,
@@ -20,6 +20,7 @@
         }
       },
       mounted: function () {
+        JSON.stringify
         console.log(this, "list-base 组件")
         // setInterval(() => {
         //   this.data = [new Date()]
@@ -38,7 +39,7 @@
     getListBaseTemplate()
     const template = `
       <input v-model="model"> {{model}}
-      <list-base :test-prop="testProps"></list-base>
+      <list-base :test-prop="testProps" :ab="testProps"></list-base>
     `
     $("#app").append(template)
     const instance = new Ame({
