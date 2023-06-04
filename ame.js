@@ -3,7 +3,7 @@
     uid: false,
     vid: false,
     mark: false,
-    dir: false,
+    dir: false
   }
 
   var incUid = (function (i) {
@@ -269,7 +269,7 @@
             {
               input: "keyup",
               focus: "focusin",
-              blur: "focusout",
+              blur: "focusout"
             }[type] || type
 
           node.attachEvent("on" + type, function () {
@@ -446,7 +446,7 @@
             name: name,
             arg: m[2] || "",
             mdfs: m[3] || "",
-            exp: nodeValue || '""',
+            exp: nodeValue || '""'
           }
 
           var $dirs = "pre,for,if,elseif,else,model,is".split(",") // 特殊指令
@@ -497,7 +497,7 @@
         slotContents["default"] = childNodes
       }
       return slotContents
-    },
+    }
   })
   // 虚拟节点方法：可以执行的指令
   VNode.prototype = {
@@ -611,7 +611,7 @@
       return {
         value: value,
         elseif: this["elseif"],
-        else: this["else"],
+        else: this["else"]
       }
     },
     elseif: function (vnode, value, fn) {
@@ -625,7 +625,7 @@
       }
       return {
         value: this.value || value,
-        else: this["else"],
+        else: this["else"]
       }
     },
     else: function (vnode, fn) {
@@ -973,7 +973,7 @@
       extend(component, vis.propertys)
       // render
       // component.$render() // $render by $parent.$children..$render
-    },
+    }
   }
 
   //
@@ -1110,7 +1110,7 @@
       eventStores[event] = eventStores[event] || []
       eventStores[event].push({
         cb: fn,
-        ctx: ctx || this,
+        ctx: ctx || this
       })
     },
     $emit: function (event, arg) {
@@ -1125,7 +1125,7 @@
           args = [].slice.call(arguments, 1)
           args[0] = {
             eventCode: event,
-            data: args[0],
+            data: args[0]
           }
           for (let i = 0, len = store.length; i < len; i++) {
             store[i].cb.apply(store[i].ctx, args)
@@ -1143,7 +1143,6 @@
         function VNodEvent() {
           eventMap = VNode.eventMap
           var eventCallback = eventMap[event]
-          console.log(eventMap, 'eventMap')
           eventCallback && eventCallback.call(VNode, arg)
         }
         if (!eventMap) {
@@ -1195,7 +1194,7 @@
 
       // mounted
       this.$mounted && this.$mounted()
-    },
+    }
   }
   extend(VM, {
     eventStores: {},
@@ -1264,7 +1263,7 @@
                   "@list": list_,
                   "@item": item_,
                   "@key": key_,
-                  "@index": index_,
+                  "@index": index_
                 }
               )
             }
@@ -1274,7 +1273,7 @@
               vnode.isIf = true // if for insert
               code += strVars('$THISVM.$VN(@id)["if"]( @value, function(){ ', {
                 "@id": vnode.uid,
-                "@value": dir.exp,
+                "@value": dir.exp
               })
             }
             // elseif
@@ -1284,7 +1283,7 @@
                 '["elseif"]( $THISVM.$VN(@id), @value, function(){ ',
                 {
                   "@id": vnode.uid,
-                  "@value": dir.exp,
+                  "@value": dir.exp
                 }
               )
             }
@@ -1292,7 +1291,7 @@
             var dir = dirs["else"]
             if (dir) {
               code += strVars('["else"]( $THISVM.$VN(@id), function(){ ', {
-                "@id": vnode.uid,
+                "@id": vnode.uid
               })
             }
 
@@ -1308,7 +1307,7 @@
                       "@mdfs": dir.mdfs,
                       "@code": dir.exp.match(/[(=+-]/)
                         ? dir.exp // 语句
-                        : dir.exp + "($event)", // handler
+                        : dir.exp + "($event)" // handler
                     }
                   )
                   break
@@ -1318,14 +1317,14 @@
                     {
                       "@id": vnode.uid,
                       "@name": attr2prop(dir.arg),
-                      "@value": dir.exp,
+                      "@value": dir.exp
                     }
                   )
                   break
                 case "ref":
                   code += strVars('$THISVM.$VN(@id).ref($THISVM, "@name")', {
                     "@id": vnode.uid,
-                    "@name": dir.exp,
+                    "@name": dir.exp
                   })
                   break
                 default:
@@ -1336,7 +1335,7 @@
                       "@dir": dir.name,
                       "@arg": dir.arg,
                       "@mdfs": dir.mdfs,
-                      "@value": dir.exp,
+                      "@value": dir.exp
                     }
                   )
               }
@@ -1361,7 +1360,7 @@
                   "@id": vnode.uid,
                   "@obj": obj_,
                   "@key": key_,
-                  "@mdfs": dir.mdfs,
+                  "@mdfs": dir.mdfs
                 }
               )
             }
@@ -1372,7 +1371,7 @@
             if (dir) {
               code += strVars('$THISVM.$VN(@id).is($THISVM, "@name")', {
                 "@id": vnode.uid,
-                "@name": dir.exp,
+                "@name": dir.exp
               })
             }
 
@@ -1422,7 +1421,7 @@
                   '$THISVM.$VN(@id).property( "nodeValue", @value )',
                   {
                     "@id": vexp.uid,
-                    "@value": parseFilter(exp),
+                    "@value": parseFilter(exp)
                   }
                 )
               })
@@ -1536,7 +1535,7 @@
     overwriteFunction: function (vm, fn) {
       // ?? scope
       var code = fn.toString()
-      console.log(code)
+      // console.log(code)
     },
     setData: function (vm, data) {
       for (var key in data) {
@@ -1548,7 +1547,7 @@
           vm[key] = item
         }
       }
-    },
+    }
   })
 
   //
@@ -1581,7 +1580,7 @@
                 vm.$render()
               }, 41)
               return vm[key]
-            },
+            }
           }))
           proxy.$vm = vm
         }
