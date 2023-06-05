@@ -20,7 +20,6 @@
         }
       },
       mounted: function () {
-        JSON.stringify
         console.log(this, "list-base 组件")
         // console.log(this.$VN('2'), "this.$VN 组件")
         // setInterval(() => {

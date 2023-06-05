@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    主
+    <list-base @test-event="handleTestEvent"></list-base>
+  </div>
+
+  <script>
+    Ame.component("list-base", {
+      template: `<div>组件</div>`,
+      data: function () {
+        return {}
+      },
+      mounted: function () {
+        console.log('子组件mounted', this)
+        this.$emit("test-event")
+      },
+    })
+    var vm = new Ame({
+      el: '#app',
+      data: {},
+      methods: {
+        handleTestEvent(){
+          console.log('自定义事件被触发')
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>

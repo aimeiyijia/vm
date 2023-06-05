@@ -735,8 +735,6 @@
         }
 
         fn(item, key, index)
-
-        // console.log(vnode.property('key'))
       })
       vm.$VN.forKeyPath = forKeyPath // **!!!**
 
@@ -757,7 +755,6 @@
       var handler = this.eventMap[key]
       // 保存||更新 handler
       this.eventMap[key] = fn //旧的fn有旧的闭包
-
       if (handler) return
 
       // 首次注册
@@ -1054,17 +1051,17 @@
       var self = this
 
       // timeGap
-      var timeGap = 1000 / 24
-      var now = +new Date()
-      var lastTime = this.$render.lastTime || 0
-      if (now - lastTime < timeGap) {
-        clearTimeout(this.$render.timer)
-        this.$render.timer = setTimeout(function () {
-          self.$render(vms)
-        }, timeGap)
-        return
-      }
-      this.$render.lastTime = now
+      // var timeGap = 1000 / 24
+      // var now = +new Date()
+      // var lastTime = this.$render.lastTime || 0
+      // if (now - lastTime < timeGap) {
+      //   clearTimeout(this.$render.timer)
+      //   this.$render.timer = setTimeout(function () {
+      //     self.$render(vms)
+      //   }, timeGap)
+      //   return
+      // }
+      // this.$render.lastTime = now
 
       // component tree updated
       vms = vms || []
@@ -1133,26 +1130,11 @@
         }
       }
       function VNodeEmit() {
-        var tm = 0
         var vnodeUid = getUid(self.$el)
         var VNode = self.$VN(vnodeUid)
-        var eventMap = VNode.eventMap
-
-        // 补偿一次事件调用
-        // 主要是补偿mounted时 VNode.eventMap还无法获取问题
-        function VNodEvent() {
-          eventMap = VNode.eventMap
-          var eventCallback = eventMap[event]
-          eventCallback && eventCallback.call(VNode, arg)
-        }
-        if (!eventMap) {
-          clearTimeout(tm)
-          tm = setTimeout(function () {
-            VNodEvent()
-          }, 100)
-        } else {
-          VNodEvent()
-        }
+        var eventMap = VNode.vis.eventMap
+        var eventCallback = eventMap[event]
+        eventCallback && eventCallback.call(VNode, arg)
       }
       VNodeEmit()
     },
@@ -1535,7 +1517,6 @@
     overwriteFunction: function (vm, fn) {
       // ?? scope
       var code = fn.toString()
-      // console.log(code)
     },
     setData: function (vm, data) {
       for (var key in data) {
@@ -1559,33 +1540,6 @@
     createElement(name) // ie8-: <component>+</component>
     options.isComponent = true
     VM.optionsMap[name] = options
-  }
-
-  // console
-  if (typeof Proxy != "undefined") {
-    setTimeout(function () {
-      for (name in window) {
-        if (name.match("webkit")) continue // !warn
-        var vm = window[name]
-        if (vm && typeof vm.$render == "function") {
-          var proxy = (window[name] = new Proxy(vm, {
-            set: function (vm, key, value) {
-              vm[key] = value
-              setTimeout(function () {
-                vm.$render()
-              }, 41)
-            },
-            get: function (vm, key) {
-              setTimeout(function () {
-                vm.$render()
-              }, 41)
-              return vm[key]
-            }
-          }))
-          proxy.$vm = vm
-        }
-      }
-    }, 500)
   }
 
   // export
