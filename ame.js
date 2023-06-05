@@ -1110,20 +1110,15 @@
         ctx: ctx || this
       })
     },
-    $emit: function (event, arg) {
+    $emit: function (event) {
+      let args = [].slice.call(arguments, 1)
       var self = this
       function globalEmit() {
         var eventStores = VM.eventStores
         let store = eventStores[event]
-        let args
 
         if (store) {
           store = store.slice(0)
-          args = [].slice.call(arguments, 1)
-          args[0] = {
-            eventCode: event,
-            data: args[0]
-          }
           for (let i = 0, len = store.length; i < len; i++) {
             store[i].cb.apply(store[i].ctx, args)
           }
@@ -1134,9 +1129,10 @@
         var VNode = self.$VN(vnodeUid)
         var eventMap = VNode.vis.eventMap
         var eventCallback = eventMap[event]
-        eventCallback && eventCallback.call(VNode, arg)
+        eventCallback && eventCallback.call(VNode, args)
       }
       VNodeEmit()
+      globalEmit()
     },
     $off: function (event, fn) {
       var eventStores = VM.eventStores

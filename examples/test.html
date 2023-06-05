@@ -25,6 +25,12 @@
       mounted: function () {
         console.log('子组件mounted', this)
         this.$emit("test-event")
+
+        this.$on('global-event', function(e){
+          console.log(e, 'global-event')
+        })
+
+        this.$emit('global-event', [123])
       },
     })
     var vm = new Ame({
