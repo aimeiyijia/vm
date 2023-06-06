@@ -12,14 +12,23 @@
 <body>
 
   <div id="app">
-    <input v-model="model"> {{model}}
+    <span v-for="item in arrayTest">
+      <input type="checkbox" v-model="model">
+      {{ item }}
+    </span>
+    
   </div>
 
   <script>
+    var arr = []
+    for (var index = 0; index < 2000; index++) {
+      arr.push(index)
+    }
     var vm = new Ame({
       el: '#app',
       data: {
-        model: 'hello vm.js'
+        arrayTest: arr,
+        model: false
       }
     })
   </script>

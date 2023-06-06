@@ -1111,15 +1111,15 @@
       })
     },
     $emit: function (event) {
-      let args = [].slice.call(arguments, 1)
+      var args = [].slice.call(arguments, 1)
       var self = this
       function globalEmit() {
         var eventStores = VM.eventStores
-        let store = eventStores[event]
+        var store = eventStores[event]
 
         if (store) {
           store = store.slice(0)
-          for (let i = 0, len = store.length; i < len; i++) {
+          for (var i = 0, len = store.length; i < len; i++) {
             store[i].cb.apply(store[i].ctx, args)
           }
         }
@@ -1144,7 +1144,7 @@
       }
 
       // specific event
-      const store = eventStores[event]
+      var store = eventStores[event]
       if (!store) return
 
       // remove all handlers
@@ -1154,8 +1154,8 @@
       }
 
       // remove specific handler
-      let cb
-      for (let i = 0, len = store.length; i < len; i++) {
+      var cb
+      for (var i = 0, len = store.length; i < len; i++) {
         cb = store[i].cb
         if (cb === fn) {
           store.splice(i, 1)
