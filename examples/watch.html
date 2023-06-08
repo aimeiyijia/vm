@@ -15,6 +15,7 @@
     <button @click="handleClick"> model++ </button> </br>
     model: {{ model }} </br>
     model2: {{ model2 }} </br>
+    model3: {{ model3 }} </br>
   </div>
 
   <script>
@@ -23,14 +24,22 @@
       data: {
         model: 1,
         model2: 2,
+        model3: 3
       },
       watch: {
         model(newVal, oldVal) {
           this.model2++
+          this.model3++
           console.log('model 值发生变化', `newVal ${newVal} oldVal ${oldVal}`)
         },
-        model2(newVal, oldVal){
+        model2(newVal, oldVal) {
           console.log('model2 值发生变化', `newVal ${newVal} oldVal ${oldVal}`)
+        },
+        model3: {
+          handler: function handler(newVal, oldVal) {
+            console.log('model3 值发生变化', `newVal ${newVal} oldVal ${oldVal}`)
+          },
+          immediate: true
         }
       },
       mounted() {

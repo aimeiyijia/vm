@@ -1029,20 +1029,7 @@
     VM.setData(this, options.computed)
 
     // watch
-    var watch = options.watch
-    if (watch) {
-      for (var key in watch) {
-        var item = watch[key]
-        if (typeof item == "function") {
-          // VM.injectFunction(this, item)
-          VM.watchStores[key] = {
-            newVal: this[key],
-            oldVal: this[key],
-            fn: item
-          }
-        }
-      }
-    }
+    VM.setWatch(this, options.watch)
 
     // el
     var el = getElement(options.el)
@@ -1558,6 +1545,32 @@
           vm[key] = VM.injectFunction(vm, item)
         } else {
           vm[key] = item
+        }
+      }
+    },
+    setWatch: function (vm, data) {
+      for (var key in data) {
+        var item = data[key]
+        if (typeof item == "function") {
+          // VM.injectFunction(this, item)
+          VM.watchStores[key] = {
+            newVal: vm[key],
+            oldVal: vm[key],
+            fn: item
+          }
+        } else {
+          if (item.handler && typeof item.handler == "function") {
+            VM.watchStores[key] = {
+              newVal: vm[key],
+              oldVal: vm[key],
+              fn: item.handler
+            }
+            if (item.immediate) {
+              item.handler.call(vm, vm[key], vm[key])
+            }
+          } else {
+            console.error('watch [' + key + "] handler must be function")
+          }
         }
       }
     },
