@@ -40,6 +40,24 @@
       .replace(/^-/, "")
   }
 
+  function strictEquals(value1, value2) {
+    if (value1 === value2) {
+      // 如果两个值相等，返回 true
+      return true
+    } else if (
+      typeof value1 === "number" &&
+      typeof value2 === "number" &&
+      isNaN(value1) &&
+      isNaN(value2)
+    ) {
+      // 如果两个值都是 NaN，返回 true
+      return true
+    } else {
+      // 其他情况返回 false
+      return false
+    }
+  }
+
   function hasOwn(obj, property) {
     // ie: !node.hasOwnProperty
     if (obj.nodeType == 1) {
@@ -1010,6 +1028,22 @@
     // computed
     VM.setData(this, options.computed)
 
+    // watch
+    var watch = options.watch
+    if (watch) {
+      for (var key in watch) {
+        var item = watch[key]
+        if (typeof item == "function") {
+          // VM.injectFunction(this, item)
+          VM.watchStores[key] = {
+            newVal: this[key],
+            oldVal: this[key],
+            fn: item
+          }
+        }
+      }
+    }
+
     // el
     var el = getElement(options.el)
     if (!options.el && !options.template) {
@@ -1051,17 +1085,19 @@
       var self = this
 
       // timeGap
-      // var timeGap = 1000 / 24
-      // var now = +new Date()
-      // var lastTime = this.$render.lastTime || 0
-      // if (now - lastTime < timeGap) {
-      //   clearTimeout(this.$render.timer)
-      //   this.$render.timer = setTimeout(function () {
-      //     self.$render(vms)
-      //   }, timeGap)
-      //   return
-      // }
-      // this.$render.lastTime = now
+      var timeGap = 1000 / 24
+      var now = +new Date()
+      var lastTime = this.$render.lastTime || 0
+      if (now - lastTime < timeGap) {
+        clearTimeout(this.$render.timer)
+        this.$render.timer = setTimeout(function () {
+          self.$render(vms)
+        }, timeGap)
+        return
+      }
+      this.$render.lastTime = now
+
+      VM.triggerWatch(this)
 
       // component tree updated
       vms = vms || []
@@ -1176,6 +1212,7 @@
   }
   extend(VM, {
     eventStores: {},
+    watchStores: {},
     compile: function (node) {
       /*
             VNode(uid).if(bool, function(){
@@ -1413,9 +1450,7 @@
         }
       }
 
-      var render = Function(
-        "var $THISVM=this;this.abc = 1;with(this){\n" + code + "\n}"
-      )
+      var render = Function("var $THISVM=this;with(this){\n" + code + "\n}")
       return render
     },
     injectFunction: function (vm, fn) {
@@ -1523,6 +1558,20 @@
           vm[key] = VM.injectFunction(vm, item)
         } else {
           vm[key] = item
+        }
+      }
+    },
+    triggerWatch: function (vm) {
+      var watchStores = VM.watchStores
+      for (var key in watchStores) {
+        var newVal = vm[key]
+        var item = watchStores[key]
+        item.oldVal = item.newVal
+        item.newVal = newVal
+
+        var fn = item.fn
+        if (!strictEquals(newVal, item.oldVal)) {
+          fn.call(vm, newVal, item.oldVal)
         }
       }
     }

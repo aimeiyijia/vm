@@ -15,7 +15,6 @@
     <button @click="handleClick"> model++ </button> </br>
     model: {{ model }} </br>
     model2: {{ model2 }} </br>
-    testComputed: {{ testComputed.v() }}
   </div>
 
   <script>
@@ -23,32 +22,23 @@
       el: '#app',
       data: {
         model: 1,
-        model2: 2
-      },
-      computed: {
-        // 不能在computed中写业务逻辑
-        testComputed: function testComputed() {
-          return `computed：${this.model + 1}`
-        }
+        model2: 2,
       },
       watch: {
-        modelFn() {
-          setTimeout(() => {
-            console.log(this)
-            this.model2 = '变了里面'
-          }, 1000)
-          this.model2 = '变了'
-          console.log('值发生变化')
+        model(newVal, oldVal) {
+          this.model2++
+          console.log('model 值发生变化', `newVal ${newVal} oldVal ${oldVal}`)
+        },
+        model2(newVal, oldVal){
+          console.log('model2 值发生变化', `newVal ${newVal} oldVal ${oldVal}`)
         }
       },
       mounted() {
-        this.model = 2
         console.log('this', this)
       },
       methods: {
         handleClick() {
           this.model++
-          console.log('testComputed', this.testComputed.v())
         }
       }
     })
