@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <button @click="handleClick"> model++ </button> </br>
+    model: {{ model }} </br>
+    testComputed: {{ testComputed.v() }}
+  </div>
+
+  <script>
+    var vm = new Ame({
+      el: '#app',
+      data: {
+        model: 1
+      },
+      computed: {
+        testComputed: function testComputed() {
+          return `computed：${ this.model + 1 }`
+        }
+      },
+      mounted() {
+        this.model = 2
+        console.log('this', this)
+      },
+      methods: {
+        handleClick() {
+          this.model++
+          console.log('testComputed', this.testComputed.v())
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

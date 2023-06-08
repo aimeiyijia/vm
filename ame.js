@@ -1502,6 +1502,7 @@
         $fn.toJSON =
           $fn.toString =
           $fn.valueOf =
+          $fn.v =
             function () {
               return fn.call(vm)
             }
