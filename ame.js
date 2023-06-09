@@ -600,20 +600,35 @@
         ""
       )
     },
-    setClass: function (value) {
+    setClass: function (data) {
       var classes = (this.classes = this.classes || {})
-      if (isArray(value)) {
+      function setClassObj(classObj) {
+        for (var name in classObj) {
+          var bool = classObj[name]
+          if (bool && !classes[name]) {
+            this.addClass(name)
+            classes[name] = true
+          }
+          if (!bool && classes[name]) {
+            this.removeClass(name)
+            classes[name] = false
+          }
+        }
       }
-      for (var name in value) {
-        var bool = value[name]
-        if (bool && !classes[name]) {
-          this.addClass(name)
-          classes[name] = true
+      if (isArray(data)) {
+        for (var key in data) {
+          var value = data[key]
+          if (typeof value == "object") {
+            setClassObj.call(this, value)
+          } else {
+            if (!classes[value]) {
+              this.addClass(value)
+              classes[value] = true
+            }
+          }
         }
-        if (!bool && classes[name]) {
-          this.removeClass(name)
-          classes[name] = false
-        }
+      } else {
+        setClassObj.call(this, data)
       }
     },
     show: function (value) {
@@ -1110,7 +1125,7 @@
     }
 
     this.$created = options.created && VM.injectFunction(this, options.created)
-    this.$created()
+    this.$created && this.$created()
 
     // first $render
     if (!options.isComponent) {

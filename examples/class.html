@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <style>
+    .redText {
+      color: red;
+    }
+
+    .boldText {
+      font-weight: bold;
+    }
+
+    .bigText {
+      font-size: 36px;
+    }
+  </style>
+  <script src="../ame.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    父组件
+    <list-base :red="red"></list-base>
+  </div>
+
+  <script>
+    Ame.component("list-base", {
+      template: `
+                  <div>
+                    <div :class="redText.v()">我是红色测试文字[computed class]</div>
+                    <div :class="class1">我是加粗、加大测试文字[class对象语法]</div>
+                    <div :class="class2">我是测试文字 [class 数组语法]</div>
+                    <div :class="class3" @click="handleClick">点击变红</div>
+                  </div>
+                `,
+      props: {
+        red: Boolean,
+      },
+      data: function () {
+        return {
+          class1: { boldText: true, bigText: true },
+          class2: [
+            {
+              boldText: true
+            },
+            'redText'
+          ],
+          class3: {
+            redText: false
+          }
+        }
+      },
+      computed: {
+        redText: function () {
+          return {
+            redText: this.red
+          }
+        }
+      },
+      methods: {
+        handleClick() {
+          this.class3.redText = true
+        }
+      },
+    })
+    var vm = new Ame({
+      el: '#app',
+      data: {
+        red: true
+      },
+    })
+  </script>
+</body>
+
+</html>
