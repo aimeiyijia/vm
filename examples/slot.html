@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app" @click="handleTest">
+    <list-base>
+      <!-- 插槽必须使用元素包裹一下，否则无法渲染， 可以使用template标签或者其他可用标签 -->
+      <span>默认插槽：{{ testData }}</span>
+      <div slot="header">
+        <b>header插槽：</b>
+        {{ testData }}
+      </div>
+    </list-base>
+  </div>
+
+  <script>
+    Ame.component("list-base", {
+      template: /*html*/
+        `<div>
+          默认插槽是否显示：
+          {{ this.showDefault ? '显示' : '隐藏'  }}
+          <div v-if="showDefault">
+            <slot></slot>
+          </div>
+          <div>
+            <slot name="header">title</slot>
+          </div>
+        </div>`,
+      data: function () {
+        return {
+          showDefault: true
+        }
+      },
+      mounted: function () {
+        // setInterval(() => {
+        //   this.showDefault = !this.showDefault
+        // }, 2000)
+        console.log('子组件mounted', this)
+      },
+    })
+    var vm = new Ame({
+      el: '#app',
+      data: {
+        testData: 1
+      },
+      methods: {
+        handleTest() {
+          this.testData++
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>
