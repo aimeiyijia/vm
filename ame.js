@@ -600,10 +600,12 @@
         ""
       )
     },
-    setClass: function (map) {
+    setClass: function (value) {
       var classes = (this.classes = this.classes || {})
-      for (var name in map) {
-        var bool = map[name]
+      if (isArray(value)) {
+      }
+      for (var name in value) {
+        var bool = value[name]
         if (bool && !classes[name]) {
           this.addClass(name)
           classes[name] = true
@@ -970,6 +972,13 @@
           removeChild(slot)
         })
 
+        // props
+        for (var key in vis.propertys) {
+          vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key]
+        }
+
+        extend(component, vis.propertys)
+
         // $mount && $render
         component.$mount(vis.node)
 
@@ -985,13 +994,6 @@
 
       var vcomponent = vis.vcomponent
       var component = vcomponent.component
-      // props
-      for (var key in vis.propertys) {
-        vis.propertys[hyphenToCamelCase(key)] = vis.propertys[key]
-      }
-      extend(component, vis.propertys)
-      // render
-      // component.$render() // $render by $parent.$children..$render
     }
   }
 
@@ -1034,13 +1036,14 @@
       // default node
       el = document.body // ie: !html
     }
-    if (el && el.computed) {
-      el = null
-      options.template = "<b>-_-</b>"
-    }
-    if (el) {
-      el.computed = true
-    }
+
+    // if (el && el.computed) {
+    //   el = null
+    //   options.template = "<b>-_-</b>"
+    // }
+    // if (el) {
+    //   el.computed = true
+    // }
     // fix ie8-: <component>
     if (el) {
       // ie8-: component('tag') -> createElement('tag') -> <tag>ok</tag>
@@ -1106,6 +1109,9 @@
       this.$render.renderTime = new Date() - renderTimeStart
     }
 
+    this.$created = options.created && VM.injectFunction(this, options.created)
+    this.$created()
+
     // first $render
     if (!options.isComponent) {
       // $children.$render
@@ -1117,6 +1123,7 @@
     el && this.$mount(el)
   }
   VM.prototype = {
+    queue: [],
     $on: function (event, fn, ctx) {
       if (typeof fn !== "function") {
         console.error("listener must be a function")
