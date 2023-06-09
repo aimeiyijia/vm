@@ -88,12 +88,13 @@
     return value instanceof Array
   }
 
-  function toArray(list) {
+  function toArray(list, start) {
     if (!list) return []
-    var length = list.length
+    start = start || 0
+    var length = list.length - start
     var arr = new Array(length)
     while (length--) {
-      arr[length] = list[length]
+      arr[length] = list[length + start]
     }
     return arr
   }
@@ -1200,6 +1201,7 @@
   extend(VM, {
     eventStores: {},
     watchStores: {},
+    _installedPlugins: {},
     compile: function (node) {
       /*
             VNode(uid).if(bool, function(){
@@ -1569,7 +1571,7 @@
               item.handler.call(vm, vm[key], vm[key])
             }
           } else {
-            console.error('watch [' + key + "] handler must be function")
+            console.error("watch [" + key + "] handler must be function")
           }
         }
       }
@@ -1599,6 +1601,23 @@
     createElement(name) // ie8-: <component>+</component>
     options.isComponent = true
     VM.optionsMap[name] = options
+  }
+
+  VM.use = function (plugin) {
+    var installedPlugins = VM._installedPlugins || (VM._installedPlugins = [])
+    if (installedPlugins.indexOf(plugin) > -1) {
+      return this
+    }
+
+    var args = toArray(arguments, 1)
+    args.unshift(this)
+    if (typeof plugin.install === "function") {
+      plugin.install.apply(plugin, args)
+    } else if (typeof plugin === "function") {
+      plugin.apply(null, args)
+    }
+    installedPlugins.push(plugin)
+    return this
   }
 
   // export
