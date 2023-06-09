@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    父组件
+    <list-base :test-prop="testProp" test-prop2="12" a="123"></list-base>
+  </div>
+
+  <script>
+    Ame.component("list-base", {
+      template: `<div>{{ testProp }} {{ a }}</div>`,
+      props: {
+        testProp: String,
+        'testProp2': String,
+        // 这样也可以 'test-prop2': String,
+        a: {
+          type: String,
+          default: '123'
+        },
+        b: Object,
+        c: Array
+      },
+      data: function () {
+        return {}
+      },
+      mounted() {
+        console.log('子组件', this)
+      },
+    })
+    var vm = new Ame({
+      el: '#app',
+      data: {
+        testProp: '父组件传递的props'
+      },
+    })
+  </script>
+</body>
+
+</html>

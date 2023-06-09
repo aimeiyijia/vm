@@ -986,6 +986,9 @@
       var vcomponent = vis.vcomponent
       var component = vcomponent.component
       // props
+      for (var key in vis.propertys) {
+        vis.propertys[hyphenToCamelCase(key)] = vis.propertys[key]
+      }
       extend(component, vis.propertys)
       // render
       // component.$render() // $render by $parent.$children..$render
@@ -1013,15 +1016,8 @@
 
     // 根据props设置的类型先初始化
     // init props
-    var props = options.props
-    if (props) {
-      var propsObj = {}
-      for (var propKey in props) {
-        var propType = props[propKey]
-        propsObj[propKey] = propType()
-      }
-      VM.setData(this, propsObj)
-    }
+    var props = options.props || {}
+    VM.setData(this, VM.resolveProps(props))
 
     // methods
     VM.setData(this, options.methods)
@@ -1236,6 +1232,7 @@
 
             // dirs
             var dirs = VNode.getDirs(node)
+
             var vnode = VNode(node)
 
             // pre
@@ -1538,6 +1535,24 @@
     overwriteFunction: function (vm, fn) {
       // ?? scope
       var code = fn.toString()
+    },
+    resolveProps(props) {
+      var propsObj = {}
+      for (var propKey in props) {
+        var propValue = props[propKey]
+        if (typeof propValue == "object") {
+          if (hasOwn(propValue, "default")) {
+            propsObj[propKey] = propValue.default
+            contains
+          }
+          if (hasOwn(propValue, "type")) {
+            propsObj[propKey] = propValue.type()
+          }
+        } else {
+          propsObj[propKey] = propValue()
+        }
+      }
+      return propsObj
     },
     setData: function (vm, data) {
       for (var key in data) {
