@@ -548,6 +548,8 @@
       this.focused = true
     },
     property: function (name, value) {
+      console.log(name, 'property name')
+      console.log(value, 'property value')
       var propertys = this.propertys
       // get
       if (arguments.length == 1) {
@@ -994,8 +996,12 @@
 
         extend(component, vis.propertys)
 
+        component.$created && component.$created()
+
         // $mount && $render
         component.$mount(vis.node)
+
+        
 
         // component 第一次不能 $parent.$render , 父组件还没运行完
         // 那么 for 指令又会运行导致 forKeyPath 错误
@@ -1125,11 +1131,12 @@
     }
 
     this.$created = options.created && VM.injectFunction(this, options.created)
-    this.$created && this.$created()
+    // this.$created && this.$created()
 
     // first $render
     if (!options.isComponent) {
       // $children.$render
+      this.$created && this.$created()
       this.$render()
     }
 
@@ -1457,6 +1464,8 @@
             break
         }
       }
+
+      console.log(code)
 
       var render = Function("var $THISVM=this;with(this){\n" + code + "\n}")
       return render
