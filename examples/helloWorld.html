@@ -13,7 +13,7 @@
 
   <div id="app">
     <span v-for="item in arrayTest">
-      <input type="checkbox" v-model="model">
+      <input type="checkbox" v-model="model" @change="handleChange">
       {{ item }}
     </span>
     
@@ -29,7 +29,12 @@
       data: {
         arrayTest: arr,
         model: false
-      }
+      },
+      methods: {
+        handleChange(val){
+          console.log(val, '勾选')
+        }
+      },
     })
   </script>
 </body>

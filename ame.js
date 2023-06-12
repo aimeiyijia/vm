@@ -482,23 +482,24 @@
       return dirs
     },
     getSlots: function (node, vm) {
+      var self = this
       var slots = {}
       vm.$slotData = {}
-      "IIF",
-        (function loop(node) {
-          forEach(node.children, function (child) {
-            var uid = getUid(child)
-            var vnode = vm.$VN(uid)
+      function loop(node) {
+        forEach(node.children, function (child) {
+          var uid = getUid(child)
+          var vnode = vm.$VN(uid)
 
-            if (child.nodeName.match(/slot/i)) {
-              name = child.getAttribute("name")
-              var scopedSlots = VM._scopedSlots[name || "default"]
-              vm.$slotData[scopedSlots.name] = vnode.propertys
-              slots[name || "default"] = child
-            }
-            loop(child)
-          })
-        })(node)
+          if (child.nodeName.match(/slot/i)) {
+            name = child.getAttribute("name")
+            var scopedSlots = VM._scopedSlots[name || "default"]
+            vm.$slotData[scopedSlots.name] = vnode.propertys
+            slots[name || "default"] = child
+          }
+          loop.call(self, child)
+        })
+      }
+      loop.call(self, node)
       return slots
     },
     getSlotContents: function (node, vm) {
@@ -745,18 +746,19 @@
 
       // 克隆元素标识，使能通过原节点标识找到克隆节点
       // forNodeUid.key
-      "IIF",
-        (function loop(forNode, cloneNode) {
-          var uid = VNode.getUid(forNode)
-          // save cloneNode
-          uid && VNode(cloneNode, uid + "." + key) // **!!!**
+      function loop(forNode, cloneNode) {
+        var uid = VNode.getUid(forNode)
+        // save cloneNode
+        uid && VNode(cloneNode, uid + "." + key) // **!!!**
 
-          var forChildNodes = forNode.childNodes
-          var childNodes = cloneNode.childNodes
-          for (var i = 0; i < forChildNodes.length; i++) {
-            loop(forChildNodes[i], childNodes[i])
-          }
-        })(forNode, cloneNode)
+        var forChildNodes = forNode.childNodes
+        var childNodes = cloneNode.childNodes
+        for (var i = 0; i < forChildNodes.length; i++) {
+          loop.call(this, forChildNodes[i], childNodes[i])
+        }
+      }
+
+      loop.call(this, forNode, cloneNode)
 
       vnode = VNode(cloneNode)
       vnode.vfor = vfor // vnode.$forNone.mackNode -> insert node
@@ -847,72 +849,74 @@
       var value = obj[key]
 
       // m -> v
-      "IIF",
-        (function updateView(i) {
-          if (!this._ieDelay && document.readyState != "complete" && i < 5) {
-            // ie: 刷新页面表单还保留上次的值
-            setTimeout(function () {
-              updateView(++i)
-            }, 41)
-            return
-          }
-          this._ieDelay = true
+      function updateView(i) {
+        var self = this
+        if (!this._ieDelay && document.readyState != "complete" && i < 5) {
+          // ie: 刷新页面表单还保留上次的值
+          setTimeout(function () {
+            updateView.call(self, ++i)
+          }, 41)
+          return
+        }
+        this._ieDelay = true
 
-          // checkbox
-          if (node.type == "checkbox") {
-            // array
-            if (value instanceof Array) {
-              var has = includes(value, vnode.property("value"))
-              vnode.property("checked", has)
-            }
-            // boolean
-            else {
-              vnode.property("checked", value)
-            }
+        // checkbox
+        if (node.type == "checkbox") {
+          // array
+          if (value instanceof Array) {
+            var has = includes(value, vnode.property("value"))
+            vnode.property("checked", has)
           }
-          // radio
-          else if (node.type == "radio") {
-            var eq = vnode.property("value") === value // ==?
-            vnode.property("checked", eq)
-          }
-          // select
-          else if (node.nodeName.match(/^select$/i)) {
-            setTimeout(function () {
-              //wait option:value
-              var hasSelected = false
-              forEach(node.options, function (option) {
-                var voption = VNode(option)
-
-                // array [multiple]
-                if (value instanceof Array) {
-                  var bool = includes(value, voption.property("value"))
-                  voption.property("selected", bool)
-                }
-                // one
-                else {
-                  vnode.property("value", value)
-
-                  if (voption.property("value") === value) {
-                    // ==?
-                    voption.property("selected", true)
-                    hasSelected = true
-                  } else {
-                    voption.property("selected", false) // !ie
-                  }
-                }
-              })
-              if (!(value instanceof Array) && !hasSelected) {
-                // ie
-                node.selectedIndex = -1
-              }
-            }, 1)
-          }
-          // input textarea ..
+          // boolean
           else {
-            // if ((document.hasFocus && document.hasFocus() )&& document.activeElement == node) return
-            vnode.property("value", value)
+            vnode.property("checked", value)
           }
-        })(0)
+        }
+        // radio
+        else if (node.type == "radio") {
+          var eq = vnode.property("value") === value // ==?
+          vnode.property("checked", eq)
+        }
+        // select
+        else if (node.nodeName.match(/^select$/i)) {
+          setTimeout(function () {
+            //wait option:value
+            var hasSelected = false
+            forEach(node.options, function (option) {
+              var voption = VNode(option)
+
+              // array [multiple]
+              if (value instanceof Array) {
+                var bool = includes(value, voption.property("value"))
+                voption.property("selected", bool)
+              }
+              // one
+              else {
+                vnode.property("value", value)
+
+                if (voption.property("value") === value) {
+                  // ==?
+                  voption.property("selected", true)
+                  hasSelected = true
+                } else {
+                  voption.property("selected", false) // !ie
+                }
+              }
+            })
+            if (!(value instanceof Array) && !hasSelected) {
+              // ie
+              node.selectedIndex = -1
+            }
+          }, 1)
+        }
+        // input textarea ..
+        else {
+          // if ((document.hasFocus && document.hasFocus() )&& document.activeElement == node) return
+          vnode.property("value", value)
+        }
+      }
+
+      updateView.call(this, 0)
 
       // v -> m
       var type = "input"
@@ -1269,7 +1273,6 @@
       scan(node)
 
       function scan(node) {
-
         switch (node.nodeType) {
           case 1: // element
             // <component>
