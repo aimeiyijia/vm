@@ -453,6 +453,8 @@
         if (name == "bind") name = "property"
         if (name == ".on") name = "on"
         if (name == "@") name = "on"
+        // if (name == "slot") name = "slot"
+        // if (name == "#") name = "slot"
         if (name == "else-if") name = "elseif"
 
         if (name in VNode.prototype) {
@@ -468,6 +470,7 @@
             exp: nodeValue || '""'
           }
 
+          // var $dirs = "pre,for,if,elseif,else,model,is,slot".split(",") // 特殊指令
           var $dirs = "pre,for,if,elseif,else,model,is".split(",") // 特殊指令
           if (includes($dirs, name)) {
             dirs[name] = dir
@@ -478,13 +481,21 @@
       })
       return dirs
     },
-    getSlots: function (node) {
+    getSlots: function (node, vm) {
       var slots = {}
+      vm.$slotData = {}
       "IIF",
         (function loop(node) {
           forEach(node.children, function (child) {
+            var uid = getUid(child)
+            var vnode = vm.$VN(uid)
+            // console.log(vnode.propertys, "getSlots -> vnode.propertys")
+            // extend(vm.$slotData, vnode.propertys)
+
             if (child.nodeName.match(/slot/i)) {
-              var name = child.getAttribute("name")
+              name = child.getAttribute("name")
+              var scopedSlots = VM._scopedSlots[name || "default"]
+              vm.$slotData[scopedSlots.name] = vnode.propertys
               slots[name || "default"] = child
             }
             loop(child)
@@ -492,21 +503,34 @@
         })(node)
       return slots
     },
-    getSlotContents: function (node) {
+    getSlotContents: function (node, vm) {
       var slotContents = {}
       var childNodes = toArray(node.childNodes)
+      console.log(childNodes, "getSlotContents -> childNodes")
       for (var i = 0; i < childNodes.length; i++) {
         var child = childNodes[i]
         if (child.nodeType == 1) {
-          var slotName = child.getAttribute("slot")
-          if (slotName) {
-            slotContents[slotName] = child
-            if (child.nodeName.match(/template/i)) {
-              slotContents[slotName] =
-                child.content || toArray(child.childNodes)
+          forEach(toArray(child.attributes), function (attribute) {
+            var nodeName = attribute.nodeName
+            var nodeValue = attribute.nodeValue
+            console.log(nodeValue, "getSlotContents -> nodeValue")
+            var m =
+              nodeName.match(/^(?:v-)?(\.on|[.:]|@|[^.:]+):?([^.]+)?(.*)/) || []
+            var slotName = m[2]
+            if (slotName) {
+              slotContents[slotName] = child
+              if (child.nodeName.match(/template/i)) {
+                slotContents[slotName] =
+                  child.content || toArray(child.childNodes)
+              }
+              VM._scopedSlots[slotName] = {
+                name: slotName,
+                value: nodeValue,
+                slotContents: child
+              }
+              remove(childNodes, child), i--
             }
-            remove(childNodes, child), i--
-          }
+          })
         }
         if (child.nodeType == 3 && !child.nodeValue.match(/\S/)) {
           remove(childNodes, child), i--
@@ -514,6 +538,11 @@
       }
       if (childNodes.length) {
         slotContents["default"] = childNodes
+        VM._scopedSlots["default"] = {
+          name: "default",
+          value: "",
+          slotContents: childNodes
+        }
       }
       return slotContents
     }
@@ -548,8 +577,6 @@
       this.focused = true
     },
     property: function (name, value) {
-      console.log(name, 'property name')
-      console.log(value, 'property value')
       var propertys = this.propertys
       // get
       if (arguments.length == 1) {
@@ -565,6 +592,8 @@
         this.setStyle(value)
         return
       }
+
+      console.log(name, "property -> name")
 
       // vnode change?
       if (propertys[name] === value && name in propertys) return value
@@ -964,6 +993,10 @@
     is: function (vm, name) {
       var vis = this.vis || this
       if (!vis.vcomponent) {
+        var slotContents = VNode.getSlotContents(vis.node, vm)
+        console.log(slotContents, "is -> slotContents")
+        console.log(VM._scopedSlots, "is -> VM._scopedSlots")
+
         // new component
         var options = VM.optionsMap[name]
         if (!options) {
@@ -980,14 +1013,7 @@
         vis.vcomponent = vcomponent
         vcomponent.vis = vis
 
-        // slots
-        var slots = VNode.getSlots(vcomponent.node)
-        var slotContents = VNode.getSlotContents(vis.node)
-        each(slots, function (slot, name) {
-          var content = slotContents[name] || slot.childNodes
-          insertBefore(content, slot)
-          removeChild(slot)
-        })
+        component.$render()
 
         // props
         for (var key in vis.propertys) {
@@ -996,12 +1022,21 @@
 
         extend(component, vis.propertys)
 
+        // console.log(component, "is -> component")
+        // console.log(vcomponent, "is -> vcomponent")
+        console.log(vm, "is -> vm")
+        // console.log(vis.node, "is -> vis.node")
+        // slots
+        var slots = VNode.getSlots(vcomponent.node, vm)
+        // var slotContents = VNode.getSlotContents(vis.node)
+        console.log(slots, "is -> slots")
+        each(slots, function (slot, name) {
+          var content = slotContents[name] || slot.childNodes
+          insertBefore(content, slot)
+          removeChild(slot)
+        })
+
         component.$created && component.$created()
-
-        // $mount && $render
-        component.$mount(vis.node)
-
-        
 
         // component 第一次不能 $parent.$render , 父组件还没运行完
         // 那么 for 指令又会运行导致 forKeyPath 错误
@@ -1011,11 +1046,17 @@
         component.$parent = vm
         vm.$children = vm.$children || []
         vm.$children.push(component)
+
+        // $mount && $render
+        component.$mount(vis.node)
       }
 
       var vcomponent = vis.vcomponent
       var component = vcomponent.component
     }
+    // slot: function () {
+    //   console.log("------")
+    // }
   }
 
   //
@@ -1112,15 +1153,15 @@
       if (includes(vms, this)) return
       vms.push(this.$vm || this) // ||proxy
 
-      // update self
-      self.$foceUpdate()
-
       // update component tree
 
       // $children.$render
       forEach(this.$children, function ($child) {
         $child.$render(vms)
       })
+
+      // update self
+      self.$foceUpdate()
 
       // $parent
       if (this.$parent) {
@@ -1130,8 +1171,7 @@
       this.$render.renderTime = new Date() - renderTimeStart
     }
 
-    this.$created = options.created && VM.injectFunction(this, options.created)
-    // this.$created && this.$created()
+    this.$created = options.created
 
     // first $render
     if (!options.isComponent) {
@@ -1141,7 +1181,8 @@
     }
 
     // mount
-    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted)
+    // this.$mounted = options.mounted && VM.injectFunction(this, options.mounted)
+    this.$mounted = options.mounted
     el && this.$mount(el)
   }
   VM.prototype = {
@@ -1226,6 +1267,7 @@
   extend(VM, {
     eventStores: {},
     watchStores: {},
+    _scopedSlots: {},
     _installedPlugins: {},
     compile: function (node) {
       /*
@@ -1394,6 +1436,11 @@
                 }
               )
             }
+
+            // var dir = dirs["slot"]
+            // if (dir) {
+            //   VM._scopedSlots[dir.arg] = dir
+            // }
 
             // is
             // 要放在所有指令最后，等property等指令设置完才能获取数据更新组件

@@ -13,11 +13,14 @@
 
   <div id="app" @click="handleTest">
     <list-base>
-      <!-- 插槽必须使用元素包裹一下，否则无法渲染， 可以使用template标签或者其他可用标签 -->
-      <span>默认插槽：{{ testData }}</span>
-      <div slot="header">
-        <b>header插槽：</b>
-        {{ testData }}
+      <div> default {{ JSON.stringify($slotData.default) }} </div>
+      <div v-slot:header="$slotData">
+        <b>header</b>
+        {{ JSON.stringify($slotData.header) }}
+      </div>
+      <div v-slot:footer="$slotData">
+        <b>footer</b>
+        {{ JSON.stringify($slotData.footer.data2.h) }}
       </div>
     </list-base>
   </div>
@@ -26,19 +29,20 @@
     Ame.component("list-base", {
       template: /*html*/
         `<div>
-          默认插槽是否显示：
-          {{ this.showDefault ? '显示' : '隐藏'  }}
-          <div v-if="showDefault">
-            <slot></slot>
-          </div>
-          <div>
-            <slot name="header">title</slot>
-          </div>
+            <slot :data="slotData"></slot>
+            <slot a="123" name="header" :data="slotData" :data1="slotData">title</slot>
+            <slot a="123" name="footer" :data2="slotData">title</slot>
         </div>`,
       data: function () {
         return {
+          slotData: {
+            h: 1
+          },
           showDefault: true
         }
+      },
+      created() {
+        console.log('子组件created', this)
       },
       mounted: function () {
         // setInterval(() => {
