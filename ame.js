@@ -489,8 +489,6 @@
           forEach(node.children, function (child) {
             var uid = getUid(child)
             var vnode = vm.$VN(uid)
-            // console.log(vnode.propertys, "getSlots -> vnode.propertys")
-            // extend(vm.$slotData, vnode.propertys)
 
             if (child.nodeName.match(/slot/i)) {
               name = child.getAttribute("name")
@@ -506,14 +504,12 @@
     getSlotContents: function (node, vm) {
       var slotContents = {}
       var childNodes = toArray(node.childNodes)
-      console.log(childNodes, "getSlotContents -> childNodes")
       for (var i = 0; i < childNodes.length; i++) {
         var child = childNodes[i]
         if (child.nodeType == 1) {
           forEach(toArray(child.attributes), function (attribute) {
             var nodeName = attribute.nodeName
             var nodeValue = attribute.nodeValue
-            console.log(nodeValue, "getSlotContents -> nodeValue")
             var m =
               nodeName.match(/^(?:v-)?(\.on|[.:]|@|[^.:]+):?([^.]+)?(.*)/) || []
             var slotName = m[2]
@@ -592,8 +588,6 @@
         this.setStyle(value)
         return
       }
-
-      console.log(name, "property -> name")
 
       // vnode change?
       if (propertys[name] === value && name in propertys) return value
@@ -994,8 +988,6 @@
       var vis = this.vis || this
       if (!vis.vcomponent) {
         var slotContents = VNode.getSlotContents(vis.node, vm)
-        console.log(slotContents, "is -> slotContents")
-        console.log(VM._scopedSlots, "is -> VM._scopedSlots")
 
         // new component
         var options = VM.optionsMap[name]
@@ -1021,15 +1013,8 @@
         }
 
         extend(component, vis.propertys)
-
-        // console.log(component, "is -> component")
-        // console.log(vcomponent, "is -> vcomponent")
-        console.log(vm, "is -> vm")
-        // console.log(vis.node, "is -> vis.node")
         // slots
         var slots = VNode.getSlots(vcomponent.node, vm)
-        // var slotContents = VNode.getSlotContents(vis.node)
-        console.log(slots, "is -> slots")
         each(slots, function (slot, name) {
           var content = slotContents[name] || slot.childNodes
           insertBefore(content, slot)
@@ -1054,9 +1039,6 @@
       var vcomponent = vis.vcomponent
       var component = vcomponent.component
     }
-    // slot: function () {
-    //   console.log("------")
-    // }
   }
 
   //
@@ -1283,20 +1265,15 @@
             VNode(uid).is('com')
             */
       var code = ""
-      // var code = 'console.log("r");' // @dev
-      // var code = 'console.trace("r");' // @dev
 
       scan(node)
 
       function scan(node) {
-        // console.log(node)
-        // console.log(outerHTML(node))
 
         switch (node.nodeType) {
           case 1: // element
             // <component>
             var tag = node.nodeName.toLowerCase()
-            // console.log(node.outerHTML)
             if (VM.optionsMap[tag]) {
               node.setAttribute("is", tag)
             }
@@ -1511,8 +1488,6 @@
             break
         }
       }
-
-      console.log(code)
 
       var render = Function("var $THISVM=this;with(this){\n" + code + "\n}")
       return render
