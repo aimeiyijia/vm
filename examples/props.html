@@ -17,8 +17,9 @@
   </div>
 
   <script>
+    Ame.component("base1", { template: `<div>第二个</div>`, })
     Ame.component("list-base", {
-      template: `<div>{{ testProp }} {{ a }}</div>`,
+      template: `<div>{{ testProp }} {{ a }}  <base1></base1>  </div>`,
       props: {
         testProp: String,
         'testProp2': String,
@@ -37,7 +38,7 @@
         return {}
       },
       computed: {
-        ah(){
+        ah() {
           return this.b
         }
       },

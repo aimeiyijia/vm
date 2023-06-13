@@ -1003,6 +1003,8 @@
           }, 1)
           return
         }
+
+        options.$slots = slotContents
         var component = VM(options)
 
         // vis <-> vcomponent
@@ -1080,6 +1082,11 @@
     // watch
     VM.setWatch(this, options.watch)
 
+    // slots
+    VM.setData(this, {
+      $slots: options.$slots || {}
+    })
+
     // el
     var el = getElement(options.el)
     if (!options.el && !options.template) {
@@ -1108,7 +1115,7 @@
     this.$el = el ? el : parseHTML(template)
 
     // compile render
-    this.$foceUpdate = VM.compile(this.$el)
+    this.$forceUpdate = VM.compile(this.$el)
 
     this.$VN = function (uid) {
       var vnode = VNode.map[uid + this.$VN.forKeyPath]
@@ -1149,7 +1156,7 @@
       })
 
       // update self
-      self.$foceUpdate()
+      self.$forceUpdate()
 
       // $parent
       if (this.$parent) {
@@ -1604,8 +1611,6 @@
 
         if (typeof propValue == "object") {
           if (hasOwn(propValue, "default")) {
-            console.log(propValue, "propValue")
-            console.log(propKey, "propKey")
             propsObj[propKey] = propValue.default
           } else if (hasOwn(propValue, "type")) {
             propsObj[propKey] = propValue.type()
