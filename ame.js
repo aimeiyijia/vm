@@ -493,7 +493,9 @@
           if (child.nodeName.match(/slot/i)) {
             name = child.getAttribute("name")
             var scopedSlots = VM._scopedSlots[name || "default"]
-            vm.$slotData[scopedSlots.name] = vnode.propertys
+            if (scopedSlots) {
+              vm.$slotData[scopedSlots.name] = vnode.propertys
+            }
             slots[name || "default"] = child
           }
           loop.call(self, child)
@@ -1166,9 +1168,12 @@
       this.$render()
     }
 
+    // 有props 或computed就再更新一下视图
+    ;(props || options.computed) && this.$render()
+
     // mount
-    // this.$mounted = options.mounted && VM.injectFunction(this, options.mounted)
-    this.$mounted = options.mounted
+    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted)
+    // this.$mounted = options.mounted
     el && this.$mount(el)
   }
   VM.prototype = {
@@ -1596,12 +1601,13 @@
       var propsObj = {}
       for (var propKey in props) {
         var propValue = props[propKey]
+
         if (typeof propValue == "object") {
           if (hasOwn(propValue, "default")) {
+            console.log(propValue, "propValue")
+            console.log(propKey, "propKey")
             propsObj[propKey] = propValue.default
-            contains
-          }
-          if (hasOwn(propValue, "type")) {
+          } else if (hasOwn(propValue, "type")) {
             propsObj[propKey] = propValue.type()
           }
         } else {

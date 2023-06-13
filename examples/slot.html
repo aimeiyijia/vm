@@ -13,6 +13,8 @@
 
   <div id="app" @click="handleTest">
     <list-base>
+      <!-- 插值语法必须使用元素包裹一下，不能裸使用 {{ testData }} -->
+      <div>插槽内插值语法：{{ testData }}</div>
       <div> default {{ JSON.stringify($slotData.default) }} </div>
       <div v-slot:header="$slotData">
         <b>header</b>
@@ -20,6 +22,7 @@
       </div>
       <div v-slot:footer="$slotData">
         <b>footer</b>
+        {{ testData }}
         {{ JSON.stringify($slotData.footer.data2.h) }}
       </div>
     </list-base>

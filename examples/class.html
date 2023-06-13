@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>hello world</title>
+  <title>class</title>
   <style>
     .redText {
       color: red;
@@ -24,8 +24,11 @@
 
 <body>
   <div id="app">
-    父组件
-    <list-base :red="red"></list-base>
+    父组件{{ red }}
+    <list-base :red="red">插槽内容
+      
+      <div>hahah{{ red }}</div>
+    </list-base>
   </div>
 
   <script>
@@ -36,6 +39,7 @@
                     <div :class="class1">我是加粗、加大测试文字[class对象语法]</div>
                     <div :class="class2">我是测试文字 [class 数组语法]</div>
                     <div :class="class3" @click="handleClick">点击变红</div>
+                    <slot></slot>  
                   </div>
                 `,
       props: {
@@ -62,6 +66,9 @@
           }
         }
       },
+      // mounted() {
+      //   // console.log(this, '组件')
+      // },
       methods: {
         handleClick() {
           this.class3.redText = true

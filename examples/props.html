@@ -25,15 +25,24 @@
         // 这样也可以 'test-prop2': String,
         a: {
           type: String,
-          default: '123'
+          default: '456'
         },
-        b: Object,
+        b: {
+          type: Object,
+          default: { h: 1 }
+        },
         c: Array
       },
       data: function () {
         return {}
       },
+      computed: {
+        ah(){
+          return this.b
+        }
+      },
       mounted() {
+        console.log('子组件 prop', this.ah.v())
         console.log('子组件', this)
       },
     })
