@@ -1129,17 +1129,17 @@
       var self = this
 
       // timeGap
-      var timeGap = 1000 / 24
-      var now = +new Date()
-      var lastTime = this.$render.lastTime || 0
-      if (now - lastTime < timeGap) {
-        clearTimeout(this.$render.timer)
-        this.$render.timer = setTimeout(function () {
-          self.$render(vms)
-        }, timeGap)
-        return
-      }
-      this.$render.lastTime = now
+      // var timeGap = 1000 / 24
+      // var now = +new Date()
+      // var lastTime = this.$render.lastTime || 0
+      // if (now - lastTime < timeGap) {
+      //   clearTimeout(this.$render.timer)
+      //   this.$render.timer = setTimeout(function () {
+      //     self.$render(vms)
+      //   }, timeGap)
+      //   return
+      // }
+      // this.$render.lastTime = now
 
       VM.triggerWatch(this)
 
