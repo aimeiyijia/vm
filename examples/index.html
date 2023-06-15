@@ -12,14 +12,17 @@
 <body>
 
   <div id="app">
+    <input v-model="model1" @input="handleChange" />
+    <!-- <input type="checkbox" v-model="model" @change="handleChange" @click="handleClick"> -->
     <span v-for="item in arrayTest">
-      <input type="checkbox" v-model="model" @change="handleChange">
+      <input type="checkbox" v-model="model" @change="function(){}" @click="handleClick">
       {{ item }}
     </span>
-    
+
   </div>
 
   <script>
+    console.log(window)
     var arr = []
     for (var index = 0; index < 100; index++) {
       arr.push(index)
@@ -28,11 +31,17 @@
       el: '#app',
       data: {
         arrayTest: arr,
+        model1: '1',
         model: false
       },
       methods: {
-        handleChange: function(val){
-          console.log(val, '勾选')
+        handleChange: function (event) {
+          console.log(event, '勾选')
+          event.stopPropagation();
+        },
+        handleClick: function (event) {
+          console.log('点击', this.model)
+          event.stopPropagation();
         }
       }
     })
