@@ -10,29 +10,31 @@
 </head>
 
 <body>
-
   <div id="app">
-    <span v-for="item in arrayTest">
-      <input type="checkbox" v-model="model" @change="handleChange">
-      {{ item }}
-    </span>
-    
+    <div v-for="item in arrayTest" v-if="cur == item" @click="handleClick"> {{ item }} </div>
   </div>
-
   <script>
     var arr = []
-    for (var index = 0; index < 100; index++) {
+    for (var index = 0; index < 5; index++) {
       arr.push(index)
     }
     var vm = new Ame({
       el: '#app',
       data: {
         arrayTest: arr,
-        model: false
+        model: false,
+        cur: 1
+      },
+      mounted: function() {
+        console.log(this, 'this')
       },
       methods: {
         handleChange: function(val){
           console.log(val, '勾选')
+        },
+        handleClick: function(){
+          this.cur = 2
+          console.log(this.cur, 'cur')
         }
       }
     })

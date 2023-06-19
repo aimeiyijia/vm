@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>hello world</title>
-  <script src="../dist/index.js"></script>
+  <script src="../src/ame.js"></script>
 </head>
 
 <body>
@@ -15,27 +15,22 @@
     <list-base>
       <!-- 插值语法必须使用元素包裹一下，不能裸使用 {{ testData }} -->
       <div>插槽内插值语法：{{ testData }}</div>
-      <div> default {{ JSON.stringify($slotData.default) }} </div>
+      <div> default {{ testData }} </div>
       <div v-slot:header="$slotData">
         <b>header</b>
-        {{ JSON.stringify($slotData.header) }}
+        <div>{{ testData }}</div>
       </div>
       <div v-slot:footer="$slotData">
         <b>footer</b>
-        {{ testData }}
-        {{ JSON.stringify($slotData.footer.data2.h) }}
+        <div>{{ testData }}</div>
       </div>
     </list-base>
   </div>
 
   <script>
+    var template = '<div> <div node-type="slot">456</div> <div node-type="slot" a="123" name="header" :data="slotData"></div><div node-type="slot" a="123" name="footer" :data="slotData"></div></div>'
     Ame.component("list-base", {
-      template: /*html*/
-        `<div>
-            <slot :data="slotData"></slot>
-            <slot a="123" name="header" :data="slotData" :data1="slotData">title</slot>
-            <slot a="123" name="footer" :data2="slotData">title</slot>
-        </div>`,
+      template: template,
       data: function () {
         return {
           slotData: {
@@ -44,7 +39,7 @@
           showDefault: true
         }
       },
-      created() {
+      created: function() {
         console.log('子组件created', this)
       },
       mounted: function () {
@@ -60,7 +55,7 @@
         testData: 1
       },
       methods: {
-        handleTest() {
+        handleTest: function() {
           this.testData++
         }
       },
