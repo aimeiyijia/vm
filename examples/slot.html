@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>hello world</title>
-  <script src="../src/ame.js"></script>
+  <script src="../dist/index.js"></script>
 </head>
 
 <body>
@@ -28,6 +28,7 @@
   </div>
 
   <script>
+    console.log(window, 'window')
     var template = '<div> <div node-type="slot">456</div> <div node-type="slot" a="123" name="header" :data="slotData"></div><div node-type="slot" a="123" name="footer" :data="slotData"></div></div>'
     Ame.component("list-base", {
       template: template,
@@ -47,7 +48,7 @@
         //   this.showDefault = !this.showDefault
         // }, 2000)
         console.log('子组件mounted', this)
-      },
+      }
     })
     var vm = new Ame({
       el: '#app',
@@ -58,7 +59,7 @@
         handleTest: function() {
           this.testData++
         }
-      },
+      }
     })
   </script>
 </body>

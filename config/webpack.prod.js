@@ -4,7 +4,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const common = require('./webpack.common.js')
 
 module.exports = common.map(config => merge(config, {
-  mode: 'production',
+  mode: 'none',
   devtool: 'source-map',
   optimization: {
     minimizer: [

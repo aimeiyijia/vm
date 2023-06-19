@@ -1713,8 +1713,9 @@
 
   // export
   VM.VNode = VNode
+  var Ame = VM
   if (typeof module == "object") {
-    module.exports = VM
+    module.exports = Ame
   } else {
     window.V = VM
     window.VM = VM

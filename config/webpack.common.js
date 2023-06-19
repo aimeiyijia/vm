@@ -15,9 +15,9 @@ module.exports = [
     // ],
     output: {
       filename: "[name].js",
-      // library: 'Ame',
-      libraryTarget: 'this',
-      // globalObject: 'this',
+      library: 'Ame',
+      // libraryTarget: 'this',
+      globalObject: 'this',
       path: path.resolve(__dirname, "../dist"),
       publicPath: "/"
     },
@@ -26,29 +26,29 @@ module.exports = [
         {
           test: /\.js$/,
           exclude: /(node_modules|bower_components)/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              presets: [
-                [
-                  "@babel/preset-env",
-                  {
-                    useBuiltIns: "usage",
-                    // loose: true,
-                    // modules: false,
-                    corejs: 3,
-                    targets: {
-                      ie: "8"
-                    }
-                  }
-                ]
-              ],
-              plugins: [
-                ["@babel/plugin-transform-runtime"],
-                ["@babel/plugin-transform-modules-commonjs"]
-              ]
-            }
-          }
+          // use: {
+          //   loader: "babel-loader",
+          //   options: {
+          //     presets: [
+          //       [
+          //         "@babel/preset-env",
+          //         {
+          //           useBuiltIns: "usage",
+          //           // loose: true,
+          //           // modules: false,
+          //           corejs: 3,
+          //           targets: {
+          //             ie: "8"
+          //           }
+          //         }
+          //       ]
+          //     ],
+          //     plugins: [
+          //       ["@babel/plugin-transform-runtime"],
+          //       ["@babel/plugin-transform-modules-commonjs"]
+          //     ]
+          //   }
+          // }
         }
       ]
     }

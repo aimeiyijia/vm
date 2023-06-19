@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../src/ame2.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/require.js/2.3.6/require.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    模块测试
+  </div>
+  <script>
+    require(['../src/ame2.js'], function(ame){
+      console.log(ame)
+    })
+    console.log(window)
+  </script>
+</body>
+
+</html>
