@@ -6,25 +6,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>hello world</title>
-  <script src="../dist/index.js"></script>
+  <script src="../src/ame.js"></script>
 </head>
 
 <body>
 
   <div id="app" @click="handleTest">
-    <list-base>
-      <!-- 插值语法必须使用元素包裹一下，不能裸使用 {{ testData }} -->
-      <div>插槽内插值语法：{{ testData }}</div>
-      <div> default {{ testData }} </div>
-      <div v-slot:header="$slotData">
-        <b>header</b>
-        <div>{{ testData }}</div>
-      </div>
-      <div v-slot:footer="$slotData">
-        <b>footer</b>
-        <div>{{ testData }}</div>
-      </div>
-    </list-base>
+    <div v-for="item in [1,2,3]">
+      <list-base>
+        <!-- 插值语法必须使用元素包裹一下，不能裸使用 {{ testData }} -->
+        <div>插槽内插值语法：{{ testData }}</div>
+        <div> default {{ testData }} </div>
+        <div v-slot:header="$slotData">
+          <b>header</b>
+          <div>{{ testData }}</div>
+        </div>
+        <div v-slot:footer="$slotData">
+          <b>footer</b>
+          <div>{{ testData }}</div>
+        </div>
+      </list-base>
+    </div>
+
   </div>
 
   <script>
@@ -40,7 +43,7 @@
           showDefault: true
         }
       },
-      created: function() {
+      created: function () {
         console.log('子组件created', this)
       },
       mounted: function () {
@@ -56,7 +59,7 @@
         testData: 1
       },
       methods: {
-        handleTest: function() {
+        handleTest: function () {
           this.testData++
         }
       }

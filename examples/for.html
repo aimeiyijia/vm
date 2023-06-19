@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../src/ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <div v-for="item in arr">123 {{ item }}</div>
+
+  </div>
+
+  <script>
+    var vm = new Ame({
+      el: '#app',
+      data: {
+        arr: [4,5]
+      },
+      methods: {}
+    })
+  </script>
+</body>
+
+</html>

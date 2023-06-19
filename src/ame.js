@@ -499,7 +499,7 @@
 
           var nodeType = child.getAttribute("node-type")
 
-          if (nodeType && nodeType == 'slot') {
+          if (nodeType && nodeType == "slot") {
             name = child.getAttribute("name")
             var scopedSlots = VM._scopedSlots[name || "default"]
             if (scopedSlots) {
@@ -604,9 +604,11 @@
       // vnode change?
       if (propertys[name] === value && name in propertys) return value
 
+      this.node[name] = value
       // 短横线转为驼峰命名
       name = hyphenToCamelCase(name)
-      return (propertys[name] = this.node[name] = value)
+      var a = (propertys[name] = value)
+      return a
     },
     text: function (value) {
       this.property("innerText", value)
@@ -674,7 +676,7 @@
     hide: function (value) {
       this.show(!value)
     },
-    'if': function (value, fn) {
+    if: function (value, fn) {
       if (value) {
         this.insert()
         fn()
@@ -684,7 +686,7 @@
       return {
         value: value,
         elseif: this["elseif"],
-        'else': this["else"]
+        else: this["else"]
       }
     },
     elseif: function (vnode, value, fn) {
@@ -698,10 +700,10 @@
       }
       return {
         value: this.value || value,
-        'else': this["else"]
+        else: this["else"]
       }
     },
-    'else': function (vnode, fn) {
+    else: function (vnode, fn) {
       if (this.value) {
         vnode.remove()
       } else {
@@ -760,7 +762,7 @@
       function loop(forNode, cloneNode) {
         var uid = VNode.getUid(forNode)
         // save cloneNode
-        uid && VNode(cloneNode, uid + "." + key) // **!!!**
+        uid && VNode(cloneNode, uid) // **!!!**
 
         var forChildNodes = forNode.childNodes
         var childNodes = cloneNode.childNodes
@@ -779,27 +781,14 @@
 
       return vnode
     },
-    /*
-        forKeyPath = vm.$VN.forKeyPath
-        for(key in list){
-            vm.$VN.forKeyPath += '.' + key
-        }
-        vm.$VN.forKeyPath = forKeyPath
 
-        vm.$VN(uid){
-            return VNode.map[uid + vm.$VN.forKeyPath]
-        }
-        */
-    'for': function (vm, list, fn) {
+    for: function (vm, list, fn) {
       var vfor = this.vis || this
 
       // this.mark()
       vfor.remove()
 
-      var forKeyPath = vm.$VN.forKeyPath // **!!!**
       each(list, function (item, key, index) {
-        // clone
-        vm.$VN.forKeyPath = forKeyPath + "." + key // **!!!**
         var vnode = vfor.clone(key)
         vnode.index = index
 
@@ -810,7 +799,6 @@
 
         fn(item, key, index)
       })
-      vm.$VN.forKeyPath = forKeyPath // **!!!**
 
       // remove
       var clones = vfor.clones
@@ -1040,10 +1028,6 @@
 
         component.$created && component.$created()
 
-        // component 第一次不能 $parent.$render , 父组件还没运行完
-        // 那么 for 指令又会运行导致 forKeyPath 错误
-        // !!! for is $render $parent.$render
-        //  -> for ... => xxx forKeyPath => xxx uid.0.0
         // $parent <-> $children
         component.$parent = vm
         vm.$children = vm.$children || []
@@ -1127,12 +1111,11 @@
     this.$forceUpdate = VM.compile(this.$el)
 
     this.$VN = function (uid) {
-      var vnode = VNode.map[uid + this.$VN.forKeyPath]
+      var vnode = VNode.map[uid]
       return vnode.vcomponent || vnode
     }
     this.$vid = incVid()
     SHOW.vid && this.$el.setAttribute("vid", this.$vid)
-    this.$VN.forKeyPath = ""
     this.$render = function (vms) {
       var renderTimeStart = new Date()
       var self = this
@@ -1181,7 +1164,7 @@
     if (!options.isComponent) {
       // $children.$render
       this.$created && this.$created()
-      this.$render()
+      // this.$render()
     }
 
     // 有props 或computed就再更新一下视图
@@ -1513,6 +1496,8 @@
         }
       }
 
+      console.log(code, "code")
+
       var render = Function("var $THISVM=this;with(this){\n" + code + "\n}")
       return render
     },
@@ -1613,14 +1598,14 @@
       // ?? scope
       var code = fn.toString()
     },
-    resolveProps: function(props) {
+    resolveProps: function (props) {
       var propsObj = {}
       for (var propKey in props) {
         var propValue = props[propKey]
 
         if (typeof propValue == "object") {
           if (hasOwn(propValue, "default")) {
-            propsObj[propKey] = propValue['default']
+            propsObj[propKey] = propValue["default"]
           } else if (hasOwn(propValue, "type")) {
             propsObj[propKey] = propValue.type()
           }
