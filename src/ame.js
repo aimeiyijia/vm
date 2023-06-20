@@ -1,49 +1,57 @@
-!(function (window, document) {
+(function (root, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(factory);
+  } else if (typeof module === "object" && module.exports) {
+    module.exports = factory();
+  } else {
+    root.Ame = factory();
+  }
+})(typeof self !== "undefined" ? self : this, function () {
   var SHOW = {
     uid: false,
     vid: false,
     mark: false,
-    dir: false
-  }
+    dir: false,
+  };
 
   var incUid = (function (i) {
     return function () {
-      return ++i
-    }
-  })(0)
+      return ++i;
+    };
+  })(0);
 
   var incVid = (function (i) {
     return function () {
-      return ++i
-    }
-  })(0)
+      return ++i;
+    };
+  })(0);
 
   //a-b => aB
   function hyphenToCamelCase(str) {
     if (typeof str !== "string") {
-      throw new TypeError("Argument must be a string")
+      throw new TypeError("Argument must be a string");
     }
     return str.replace(/-([a-z])/g, function (match, p1) {
-      return String.fromCharCode(p1.charCodeAt(0) - 32)
-    })
+      return String.fromCharCode(p1.charCodeAt(0) - 32);
+    });
   }
 
   // aB => a-b
   function camelCaseToHyphen(str) {
     if (typeof str !== "string") {
-      throw new Error("Parameter must be a string")
+      throw new Error("Parameter must be a string");
     }
     return str
       .replace(/[A-Z]/g, function (match) {
-        return "-" + match.toLowerCase()
+        return "-" + match.toLowerCase();
       })
-      .replace(/^-/, "")
+      .replace(/^-/, "");
   }
 
   function strictEquals(value1, value2) {
     if (value1 === value2) {
       // 如果两个值相等，返回 true
-      return true
+      return true;
     } else if (
       typeof value1 === "number" &&
       typeof value2 === "number" &&
@@ -51,120 +59,120 @@
       isNaN(value2)
     ) {
       // 如果两个值都是 NaN，返回 true
-      return true
+      return true;
     } else {
       // 其他情况返回 false
-      return false
+      return false;
     }
   }
 
   function hasOwn(obj, property) {
     // ie: !node.hasOwnProperty
     if (obj.nodeType == 1) {
-      return obj[property] // all: !img.hasOwnProperty('onload') 'src' ..
+      return obj[property]; // all: !img.hasOwnProperty('onload') 'src' ..
     } else {
-      return Object.hasOwnProperty.call(obj, property)
+      return Object.hasOwnProperty.call(obj, property);
     }
   }
 
   function extend(obj, map) {
     for (var key in map) {
-      if (!hasOwn(map, key)) continue
-      obj[key] = map[key]
+      if (!hasOwn(map, key)) continue;
+      obj[key] = map[key];
     }
-    return obj
+    return obj;
   }
 
   function orExtend(obj, map) {
     for (var key in map) {
-      if (!hasOwn(map, key)) continue
-      if (key in obj) continue
-      obj[key] = map[key]
+      if (!hasOwn(map, key)) continue;
+      if (key in obj) continue;
+      obj[key] = map[key];
     }
-    return obj
+    return obj;
   }
 
   function isArray(value) {
-    return value instanceof Array
+    return value instanceof Array;
   }
 
   function toArray(list, start) {
-    if (!list) return []
-    start = start || 0
-    var length = list.length - start
-    var arr = new Array(length)
+    if (!list) return [];
+    start = start || 0;
+    var length = list.length - start;
+    var arr = new Array(length);
     while (length--) {
-      arr[length] = list[length + start]
+      arr[length] = list[length + start];
     }
-    return arr
+    return arr;
   }
 
   function forEach(list, fn) {
-    if (!list) return
+    if (!list) return;
     for (var i = 0, length = list.length; i < length; i++) {
-      var item = list[i]
-      fn(item, i, i, list)
+      var item = list[i];
+      fn(item, i, i, list);
     }
   }
 
   function each(list, fn) {
     if (list instanceof Array) {
-      forEach(list, fn)
+      forEach(list, fn);
     } else {
-      var i = 0
+      var i = 0;
       for (var key in list) {
-        if (!hasOwn(list, key)) continue
-        var item = list[key]
-        fn(item, key, i++, list)
+        if (!hasOwn(list, key)) continue;
+        var item = list[key];
+        fn(item, key, i++, list);
       }
     }
   }
 
   var indexOf = [].indexOf
     ? function (array, value) {
-        return array.indexOf(value)
+        return array.indexOf(value);
       }
     : function (array, value) {
         for (var i = 0; i < array.length; i++) {
           if (array[i] == value) {
-            return i
+            return i;
           }
         }
-        return -1
-      }
+        return -1;
+      };
 
   function includes(array, value) {
-    return indexOf(array, value) > -1
+    return indexOf(array, value) > -1;
   }
 
   function remove(array, value) {
     for (var i = 0; i < array.length; i++) {
-      var item = array[i]
+      var item = array[i];
       if (item === value) {
-        array.splice(i, 1), i--
-        return
+        array.splice(i, 1), i--;
+        return;
       }
     }
   }
 
   var trim = "".trim
     ? function (string) {
-        return string.trim()
+        return string.trim();
       }
     : function (string) {
-        return String(string).replace(/^\s+|\s+$/g, "")
-      }
+        return String(string).replace(/^\s+|\s+$/g, "");
+      };
 
   function toNumber(value) {
-    if (!isNaN(value)) return Number(value)
-    return value
+    if (!isNaN(value)) return Number(value);
+    return value;
   }
 
   function strVars(s, vs) {
     for (var k in vs) {
-      s = s.replace(RegExp(k, "g"), vs[k])
+      s = s.replace(RegExp(k, "g"), vs[k]);
     }
-    return s + "\n"
+    return s + "\n";
   }
 
   function parseText(text) {
@@ -173,7 +181,7 @@
       text
         // }}(["\]){{ -> "\"text\\"
         .replace(/(^|}}).*?({{|$)/g, function ($) {
-          return $.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
+          return $.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
         })
         // \n -> "\n code"
         .replace(/\r?\n/g, "\\n")
@@ -181,44 +189,44 @@
         .replace(/{{(.*?)}}/g, '"+($1)+"') +
       //
       '"'
-    )
+    );
   }
 
   function parseFilter(text) {
-    var arr = text.replace("||", "\r\r").split("|")
-    var exp = arr[0].replace("\r\r", "||")
-    arr.shift()
-    var code = exp
+    var arr = text.replace("||", "\r\r").split("|");
+    var exp = arr[0].replace("\r\r", "||");
+    arr.shift();
+    var code = exp;
     forEach(arr, function (item) {
       if (!item.match(/\(/)) {
-        code = "$FILTER." + item + "( " + code + " )"
+        code = "$FILTER." + item + "( " + code + " )";
       } else {
-        code = "$FILTER." + item.replace(/\(/, "( " + code + ", ")
+        code = "$FILTER." + item.replace(/\(/, "( " + code + ", ");
       }
-    })
-    return code
+    });
+    return code;
   }
 
   function createElement(name) {
-    return document.createElement(name)
+    return document.createElement(name);
   }
 
   function createTextNode(value) {
-    return document.createTextNode(value)
+    return document.createTextNode(value);
   }
 
   function createComment(value) {
-    return document.createComment(value)
+    return document.createComment(value);
   }
 
   function insertBefore(node, target) {
     if (!node.nodeType && "length" in node) {
       forEach(toArray(node), function (node) {
-        insertBefore(node, target)
-      })
-      return
+        insertBefore(node, target);
+      });
+      return;
     }
-    target.parentNode.insertBefore(node, target)
+    target.parentNode.insertBefore(node, target);
   }
 
   // (function() {
@@ -228,45 +236,45 @@
   // })();
 
   function removeChild(node) {
-    node.parentNode.removeChild(node)
+    node.parentNode.removeChild(node);
   }
 
-  var parseEl = createElement("div")
+  var parseEl = createElement("div");
 
   function parseHTML(html) {
-    parseEl.innerHTML = html
-    var el = parseEl.children[0] || parseEl.childNodes[0]
-    parseEl.removeChild(el) // ie8-: 如不移除就清空， el 的子节点也会被清空
-    parseEl.innerHTML = ""
-    return el
+    parseEl.innerHTML = html;
+    var el = parseEl.children[0] || parseEl.childNodes[0];
+    parseEl.removeChild(el); // ie8-: 如不移除就清空， el 的子节点也会被清空
+    parseEl.innerHTML = "";
+    return el;
   }
 
   function outerHTML(node) {
-    if (node.outerHTML) return node.outerHTML
-    parseEl.innerHTML = ""
-    parseEl.appendChild(node.cloneNode(true))
-    return parseEl.innerHTML
+    if (node.outerHTML) return node.outerHTML;
+    parseEl.innerHTML = "";
+    parseEl.appendChild(node.cloneNode(true));
+    return parseEl.innerHTML;
   }
 
   var contains = parseEl.contains
     ? function (node, child) {
-        return node.contains(child)
+        return node.contains(child);
       }
     : function (node, child) {
         return (
           node == child ||
           (function loop(child) {
-            var parentNode = child.parentNode
-            return parentNode == node || (parentNode && loop(parentNode))
+            var parentNode = child.parentNode;
+            return parentNode == node || (parentNode && loop(parentNode));
           })(child)
-        )
-      }
+        );
+      };
 
   function getElement(selector) {
-    if (!selector) return
-    if (selector.nodeType == 1) return selector
-    if (document.querySelector) return document.querySelector(selector)
-    if (selector.match(/^#/)) return document.getElementById(selector.slice(1))
+    if (!selector) return;
+    if (selector.nodeType == 1) return selector;
+    if (document.querySelector) return document.querySelector(selector);
+    if (selector.match(/^#/)) return document.getElementById(selector.slice(1));
   }
 
   // readonly -> readOnly
@@ -274,19 +282,19 @@
   var attrPropMap = {
     // 'text': 'innerText',
     // 'html': 'innerHTML'
-  }
+  };
   for (var name in createElement("input")) {
-    if (!name.match(/[A-Z]/)) continue
-    attrPropMap[name.toLowerCase()] = name
+    if (!name.match(/[A-Z]/)) continue;
+    attrPropMap[name.toLowerCase()] = name;
   }
   function attr2prop(name) {
-    return attrPropMap[name] || name
+    return attrPropMap[name] || name;
   }
 
   var on = (function () {
     return window.addEventListener
       ? function (node, type, fn, useCapture) {
-          node.addEventListener(type, fn, useCapture)
+          node.addEventListener(type, fn, useCapture);
         }
       : function (node, type, fn) {
           // ie
@@ -295,796 +303,797 @@
               input: "keyup",
               change: "propertychange",
               focus: "focusin",
-              blur: "focusout"
-            }[type] || type
+              blur: "focusout",
+            }[type] || type;
 
           node.attachEvent("on" + type, function () {
-            var event = window.event
-            event.target = event.srcElement
+            var event = window.event;
+            event.target = event.srcElement;
             event.preventDefault = function () {
-              event.returnValue = false
-            }
+              event.returnValue = false;
+            };
             event.stopPropagation = function () {
-              event.cancelBubble = true
-            }
-            fn(event)
-          })
-        }
-  })()
+              event.cancelBubble = true;
+            };
+            fn(event);
+          });
+        };
+  })();
 
   var emit = (function () {
-    return window.addEventListener ? 1 : 2
-  })()
+    return window.addEventListener ? 1 : 2;
+  })();
 
   var off = (function () {
     return window.removeEventListener
       ? function (node, fn) {
-          node.removeEventListener(fn)
+          node.removeEventListener(fn);
         }
       : function (node, fn) {
           // todo
-        }
-  })()
+        };
+  })();
 
   var live = function (node, type, fn, useCapture) {
     // true: 事件捕捉。 focus, blur 等事件不支持冒泡
-    useCapture = "focus,blur".match(type) ? true : useCapture
+    useCapture = "focus,blur".match(type) ? true : useCapture;
     on(
       document,
       type,
       function (event) {
         if (contains(node, event.target)) {
-          fn(event)
+          fn(event);
         }
       },
       useCapture
-    )
-  }
+    );
+  };
 
   var canSetUidOnTextNode = (function () {
     // ie8-: false
     try {
-      return (document.createTextNode("").uid = true)
+      return (document.createTextNode("").uid = true);
     } catch (e) {}
-  })()
+  })();
 
   var isCloneTextNodeAutoConcat = (function () {
     // ie8-: true
-    var parent = document.createElement("div")
-    var text1 = document.createTextNode("1")
-    var text2 = document.createTextNode("2")
-    parent.appendChild(text1)
-    parent.appendChild(text2)
-    var cloneNode = parent.cloneNode(true)
-    return parent.childNodes.length != cloneNode.childNodes.length
-  })()
+    var parent = document.createElement("div");
+    var text1 = document.createTextNode("1");
+    var text2 = document.createTextNode("2");
+    parent.appendChild(text1);
+    parent.appendChild(text2);
+    var cloneNode = parent.cloneNode(true);
+    return parent.childNodes.length != cloneNode.childNodes.length;
+  })();
 
   //
   // 虚拟节点
   //
   function setUid(node, uid) {
     if (node.nodeType == 1) {
-      node.uid = uid
-      SHOW.uid && node.setAttribute("uid", uid) // @dev
+      node.uid = uid;
+      SHOW.uid && node.setAttribute("uid", uid); // @dev
     } else if (node.nodeType == 3) {
       if (canSetUidOnTextNode) {
-        node.uid = uid
+        node.uid = uid;
       } else {
         // ie
         // save on parentNode
-        var parentNode = node.parentNode
-        var map = parentNode.uidNodeMap || (parentNode.uidNodeMap = {})
-        map[uid] = node
+        var parentNode = node.parentNode;
+        var map = parentNode.uidNodeMap || (parentNode.uidNodeMap = {});
+        map[uid] = node;
       }
     }
   }
   function getUid(node) {
     if (node.nodeType == 1) {
-      return node.uid
+      return node.uid;
     } else if (node.nodeType == 3) {
       if (canSetUidOnTextNode) {
-        return node.uid
+        return node.uid;
       }
-      var map = node.parentNode.uidNodeMap
+      var map = node.parentNode.uidNodeMap;
       for (var uid in map) {
         if (map[uid] == node) {
-          return uid
+          return uid;
         }
       }
     }
   }
   function VNode(node, cloneUid) {
     // VNode(node) -> new VNode(node)
-    if (!(this instanceof VNode)) return new VNode(node, cloneUid)
+    if (!(this instanceof VNode)) return new VNode(node, cloneUid);
 
     // @dev
     // VNode(uid) -> vnode
     if (typeof node != "object") {
-      return VNode.map[node]
+      return VNode.map[node];
     }
 
     // VNode(node) -> return saved
     if (!cloneUid) {
       // !cloneUid: ie会把 node.uid 复制到克隆节点
-      var uid = VNode.getUid(node)
+      var uid = VNode.getUid(node);
       if (uid) {
-        return VNode.map[uid]
+        return VNode.map[uid];
       }
     }
 
     // save
     // VNode(unSavedNode) || VNode(node, cloneUid)
-    var uid = cloneUid || incUid()
-    this.uid = uid
-    this.node = node
-    this.attrs = VNode.getAttrs(node)
-    this.propertys = extend({}, this.attrs)
+    var uid = cloneUid || incUid();
+    this.uid = uid;
+    this.node = node;
+    this.attrs = VNode.getAttrs(node);
+    this.propertys = extend({}, this.attrs);
 
-    VNode.setUid(node, uid) // node -> uid
-    VNode.map[uid] = this // uid -> vnode
+    VNode.setUid(node, uid); // node -> uid
+    VNode.map[uid] = this; // uid -> vnode
   }
   extend(VNode, {
     map: {}, // uid.key.path: node
     setUid: setUid,
     getUid: getUid,
     getAttrs: function (node) {
-      var attrs = {}
+      var attrs = {};
       forEach(node.attributes, function (attribute) {
         if (attribute.specified || attribute.nodeName == "value") {
           // ie || ie7-
-          attrs[attribute.nodeName] = attribute.nodeValue
+          attrs[attribute.nodeName] = attribute.nodeValue;
         }
-      })
-      return attrs
+      });
+      return attrs;
     },
     getDirs: function (node) {
       // for 等特殊指令通过 dirs[name] 获取
       // 普通指令遍历获取
-      var dirs = Array()
-      dirs.size = 0 // 通过 size 判断数量
+      var dirs = Array();
+      dirs.size = 0; // 通过 size 判断数量
 
       // ie7: !!toArray ?? for??
       forEach(toArray(node.attributes), function (attribute) {
-        if (!attribute.specified) return // ie
+        if (!attribute.specified) return; // ie
 
-        var nodeName = attribute.nodeName
-        var nodeValue = attribute.nodeValue
-        if (nodeName == "for" && !nodeValue.match(/ (in|of) /)) return
+        var nodeName = attribute.nodeName;
+        var nodeValue = attribute.nodeValue;
+        if (nodeName == "for" && !nodeValue.match(/ (in|of) /)) return;
 
         // dir                      v-    .on  .:  @  on    :  click   .mdf.s
         var m =
-          nodeName.match(/^(?:v-)?(\.on|[.:]|@|[^.:]+):?([^.]+)?(.*)/) || []
-        var name = m[1]
-        if (name == ".") name = "property"
-        if (name == ":") name = "property"
-        if (name == "bind") name = "property"
-        if (name == ".on") name = "on"
-        if (name == "@") name = "on"
+          nodeName.match(/^(?:v-)?(\.on|[.:]|@|[^.:]+):?([^.]+)?(.*)/) || [];
+        var name = m[1];
+        if (name == ".") name = "property";
+        if (name == ":") name = "property";
+        if (name == "bind") name = "property";
+        if (name == ".on") name = "on";
+        if (name == "@") name = "on";
         // if (name == "slot") name = "slot"
         // if (name == "#") name = "slot"
-        if (name == "else-if") name = "elseif"
+        if (name == "else-if") name = "elseif";
 
         if (name in VNode.prototype) {
           // 指令就是虚拟节点的方法
-          SHOW.dir || node.removeAttribute(nodeName) // !@dev
-          dirs.size += 1
+          SHOW.dir || node.removeAttribute(nodeName); // !@dev
+          dirs.size += 1;
 
           var dir = {
             nodeName: nodeName,
             name: name,
             arg: m[2] || "",
             mdfs: m[3] || "",
-            exp: nodeValue || '""'
-          }
+            exp: nodeValue || '""',
+          };
 
           // var $dirs = "pre,for,if,elseif,else,model,is,slot".split(",") // 特殊指令
-          var $dirs = "pre,for,if,elseif,else,model,is".split(",") // 特殊指令
+          var $dirs = "pre,for,if,elseif,else,model,is".split(","); // 特殊指令
           if (includes($dirs, name)) {
-            dirs[name] = dir
+            dirs[name] = dir;
           } else {
-            dirs.push(dir)
+            dirs.push(dir);
           }
         }
-      })
-      return dirs
+      });
+      return dirs;
     },
     getSlots: function (node, vm) {
-      var self = this
-      var slots = {}
-      vm.$slotData = {}
+      var self = this;
+      var slots = {};
+      vm.$slotData = {};
       function loop(node) {
         forEach(node.children, function (child) {
-          var uid = getUid(child)
-          var vnode = vm.$VN(uid)
+          var uid = getUid(child);
+          var vnode = vm.$VN(uid);
 
-          var nodeType = child.getAttribute("node-type")
+          var nodeType = child.getAttribute("node-type");
 
           if (nodeType && nodeType == "slot") {
-            name = child.getAttribute("name")
-            var scopedSlots = VM._scopedSlots[name || "default"]
+            name = child.getAttribute("name");
+            var scopedSlots = VM._scopedSlots[name || "default"];
             if (scopedSlots) {
-              vm.$slotData[scopedSlots.name] = vnode.propertys
+              vm.$slotData[scopedSlots.name] = vnode.propertys;
             }
-            slots[name || "default"] = child
+            slots[name || "default"] = child;
           }
-          loop.call(self, child)
-        })
+          loop.call(self, child);
+        });
       }
-      loop.call(self, node)
-      return slots
+      loop.call(self, node);
+      return slots;
     },
     getSlotContents: function (node, vm) {
-      var slotContents = {}
-      var childNodes = toArray(node.childNodes)
+      var slotContents = {};
+      var childNodes = toArray(node.childNodes);
       for (var i = 0; i < childNodes.length; i++) {
-        var child = childNodes[i]
+        var child = childNodes[i];
         if (child.nodeType == 1) {
           forEach(toArray(child.attributes), function (attribute) {
-            var nodeName = attribute.nodeName
-            var nodeValue = attribute.nodeValue
+            var nodeName = attribute.nodeName;
+            var nodeValue = attribute.nodeValue;
             var m =
-              nodeName.match(/^(?:v-)?(\.on|[.:]|@|[^.:]+):?([^.]+)?(.*)/) || []
-            var slotName = m[2]
+              nodeName.match(/^(?:v-)?(\.on|[.:]|@|[^.:]+):?([^.]+)?(.*)/) ||
+              [];
+            var slotName = m[2];
             if (slotName) {
-              slotContents[slotName] = child
+              slotContents[slotName] = child;
               if (child.nodeName.match(/template/i)) {
                 slotContents[slotName] =
-                  child.content || toArray(child.childNodes)
+                  child.content || toArray(child.childNodes);
               }
               VM._scopedSlots[slotName] = {
                 name: slotName,
                 value: nodeValue,
-                slotContents: child
-              }
-              remove(childNodes, child), i--
+                slotContents: child,
+              };
+              remove(childNodes, child), i--;
             }
-          })
+          });
         }
         if (child.nodeType == 3 && !child.nodeValue.match(/\S/)) {
-          remove(childNodes, child), i--
+          remove(childNodes, child), i--;
         }
       }
       if (childNodes.length) {
-        slotContents["default"] = childNodes
+        slotContents["default"] = childNodes;
         VM._scopedSlots["default"] = {
           name: "default",
           value: "",
-          slotContents: childNodes
-        }
+          slotContents: childNodes,
+        };
       }
-      return slotContents
-    }
-  })
+      return slotContents;
+    },
+  });
   // 虚拟节点方法：可以执行的指令
   VNode.prototype = {
     pre: null,
     ref: function (vm, name) {
-      var $refs = vm.$refs || (vm.$refs = {})
-      var node = $refs[name]
+      var $refs = vm.$refs || (vm.$refs = {});
+      var node = $refs[name];
       if (!this.vfor) {
         if (!node) {
-          $refs[name] = this.node
+          $refs[name] = this.node;
         }
       } else {
         if (!node) {
           // ??object
-          $refs[name] = []
+          $refs[name] = [];
         }
         if (!$refs[name][this.index]) {
-          $refs[name][this.index] = this.node
+          $refs[name][this.index] = this.node;
         }
       }
     },
     autofocus: function () {
-      if (this.focused) return
-      var self = this
+      if (this.focused) return;
+      var self = this;
       setTimeout(function () {
         // ie?
-        self.node.focus()
-      }, 411)
-      this.focused = true
+        self.node.focus();
+      }, 411);
+      this.focused = true;
     },
     property: function (name, value) {
-      var propertys = this.propertys
+      var propertys = this.propertys;
       // get
       if (arguments.length == 1) {
         // :value="object"
-        return name in propertys ? propertys[name] : this.node[name]
+        return name in propertys ? propertys[name] : this.node[name];
       }
       // set
       if (name == "class") {
-        this.setClass(value)
-        return
+        this.setClass(value);
+        return;
       }
       if (name == "style") {
-        this.setStyle(value)
-        return
+        this.setStyle(value);
+        return;
       }
 
       // vnode change?
-      if (propertys[name] === value && name in propertys) return value
+      if (propertys[name] === value && name in propertys) return value;
 
-      this.node[name] = value
+      this.node[name] = value;
       // 短横线转为驼峰命名
-      name = hyphenToCamelCase(name)
-      var a = (propertys[name] = value)
-      return a
+      name = hyphenToCamelCase(name);
+      var a = (propertys[name] = value);
+      return a;
     },
     text: function (value) {
-      this.property("innerText", value)
+      this.property("innerText", value);
     },
     html: function (value) {
-      this.property("innerHTML", value)
+      this.property("innerHTML", value);
     },
     setStyle: function (map) {
-      var style = (this.style = this.style || {})
+      var style = (this.style = this.style || {});
       for (var key in map) {
-        var value = map[key]
-        if (style[key] === value) continue
+        var value = map[key];
+        if (style[key] === value) continue;
         try {
           // ie
-          style[key] = this.node.style[key] = value
+          style[key] = this.node.style[key] = value;
         } catch (e) {}
       }
     },
     hasClass: function (name) {
-      return this.node.className.match(RegExp("(^| )" + name + "( |$)", "i"))
+      return this.node.className.match(RegExp("(^| )" + name + "( |$)", "i"));
     },
     addClass: function (name) {
-      this.node.className += " " + name.replace(/, ?/g, " ")
+      this.node.className += " " + name.replace(/, ?/g, " ");
     },
     removeClass: function (name) {
       this.node.className = this.node.className.replace(
         RegExp("(^| )" + name + "(?= |$)", "ig"),
         ""
-      )
+      );
     },
     setClass: function (data) {
-      var classes = (this.classes = this.classes || {})
+      var classes = (this.classes = this.classes || {});
       function setClassObj(classObj) {
         for (var name in classObj) {
-          var bool = classObj[name]
+          var bool = classObj[name];
           if (bool && !classes[name]) {
-            this.addClass(name)
-            classes[name] = true
+            this.addClass(name);
+            classes[name] = true;
           }
           if (!bool && classes[name]) {
-            this.removeClass(name)
-            classes[name] = false
+            this.removeClass(name);
+            classes[name] = false;
           }
         }
       }
       if (isArray(data)) {
         for (var key in data) {
-          var value = data[key]
+          var value = data[key];
           if (typeof value == "object") {
-            setClassObj.call(this, value)
+            setClassObj.call(this, value);
           } else {
             if (!classes[value]) {
-              this.addClass(value)
-              classes[value] = true
+              this.addClass(value);
+              classes[value] = true;
             }
           }
         }
       } else {
-        setClassObj.call(this, data)
+        setClassObj.call(this, data);
       }
     },
     show: function (value) {
-      this.setStyle({ display: value ? "" : "none" })
+      this.setStyle({ display: value ? "" : "none" });
     },
     hide: function (value) {
-      this.show(!value)
+      this.show(!value);
     },
-    if: function (value, fn) {
+    "if": function (value, fn) {
       if (value) {
-        this.insert()
-        fn()
+        this.insert();
+        fn();
       } else {
-        this.remove()
+        this.remove();
       }
       return {
         value: value,
         elseif: this["elseif"],
-        else: this["else"]
-      }
+        "else": this["else"],
+      };
     },
     elseif: function (vnode, value, fn) {
       if (this.value) {
-        vnode.remove()
+        vnode.remove();
       } else if (value) {
-        vnode.insert()
-        fn()
+        vnode.insert();
+        fn();
       } else {
-        vnode.remove()
+        vnode.remove();
       }
       return {
         value: this.value || value,
-        else: this["else"]
-      }
+        "else": this["else"],
+      };
     },
-    else: function (vnode, fn) {
+    "else": function (vnode, fn) {
       if (this.value) {
-        vnode.remove()
+        vnode.remove();
       } else {
-        vnode.insert()
-        fn()
+        vnode.insert();
+        fn();
       }
     },
     mark: function () {
-      if (this.markNode) return
-      var node = this.node
-      var mark = document.createTextNode("")
+      if (this.markNode) return;
+      var node = this.node;
+      var mark = document.createTextNode("");
       if (SHOW.mark || !canSetUidOnTextNode) {
-        var mark = document.createComment(this.uid) // @dev
+        var mark = document.createComment(this.uid); // @dev
         // var mark = document.createComment(node.outerHTML) // @dev
       }
-      insertBefore(mark, node)
-      this.markNode = mark
-      mark.node = node // @dev
+      insertBefore(mark, node);
+      this.markNode = mark;
+      mark.node = node; // @dev
     },
     remove: function () {
       if (this.vcomponent) {
-        this.vcomponent.remove()
-        return
+        this.vcomponent.remove();
+        return;
       }
-      var node = this.node
-      var parentNode = node.parentNode
+      var node = this.node;
+      var parentNode = node.parentNode;
       if (parentNode && parentNode.nodeType == 1) {
-        this.mark()
-        parentNode.removeChild(node)
+        this.mark();
+        parentNode.removeChild(node);
       }
     },
     insert: function (toNode) {
       if (this.vcomponent) {
-        this.vcomponent.insert()
-        return
+        this.vcomponent.insert();
+        return;
       }
-      var node = this.node
-      var parentNode = node.parentNode
+      var node = this.node;
+      var parentNode = node.parentNode;
       if (!parentNode || parentNode.nodeType != 1) {
-        var markNode = toNode || this.markNode || this.vfor.markNode
-        insertBefore(node, markNode)
+        var markNode = toNode || this.markNode || this.vfor.markNode;
+        insertBefore(node, markNode);
       }
     },
     clone: function (key) {
-      var clones = (this.clones = this.clones || {})
-      var vnode = clones[key]
-      if (vnode) return vnode // cache
+      var clones = (this.clones = this.clones || {});
+      var vnode = clones[key];
+      if (vnode) return vnode; // cache
 
       // clone
-      var vfor = this
-      var forNode = this.node
-      var cloneNode = forNode.cloneNode(true)
+      var vfor = this;
+      var forNode = this.node;
+      var cloneNode = forNode.cloneNode(true);
 
       // 克隆元素标识，使能通过原节点标识找到克隆节点
       // forNodeUid.key
       function loop(forNode, cloneNode) {
-        var uid = VNode.getUid(forNode)
+        var uid = VNode.getUid(forNode);
         // save cloneNode
-        uid && VNode(cloneNode, uid) // **!!!**
+        uid && VNode(cloneNode, uid); // **!!!**
 
-        var forChildNodes = forNode.childNodes
-        var childNodes = cloneNode.childNodes
+        var forChildNodes = forNode.childNodes;
+        var childNodes = cloneNode.childNodes;
         for (var i = 0; i < forChildNodes.length; i++) {
-          loop.call(this, forChildNodes[i], childNodes[i])
+          loop.call(this, forChildNodes[i], childNodes[i]);
         }
       }
 
-      loop.call(this, forNode, cloneNode)
+      loop.call(this, forNode, cloneNode);
 
-      vnode = VNode(cloneNode)
-      vnode.vfor = vfor // vnode.$forNone.mackNode -> insert node
+      vnode = VNode(cloneNode);
+      vnode.vfor = vfor; // vnode.$forNone.mackNode -> insert node
 
       // cache
-      clones[key] = vnode
+      clones[key] = vnode;
 
-      return vnode
+      return vnode;
     },
 
-    for: function (vm, list, fn) {
-      var vfor = this.vis || this
+    "for": function (vm, list, fn) {
+      var vfor = this.vis || this;
 
       // this.mark()
-      vfor.remove()
+      vfor.remove();
 
       each(list, function (item, key, index) {
-        var vnode = vfor.clone(key)
-        vnode.index = index
+        var vnode = vfor.clone(key);
+        vnode.index = index;
 
         // 当 for, if 同时存在，for insert, if false remove, 会造成dom更新
         if (!vnode.isIf) {
-          vnode.insert()
+          vnode.insert();
         }
 
-        fn(item, key, index)
-      })
+        fn(item, key, index);
+      });
 
       // remove
-      var clones = vfor.clones
+      var clones = vfor.clones;
       for (var key in clones) {
-        var vnode = clones[key]
+        var vnode = clones[key];
         if (!list || !(key in list)) {
-          vnode.remove()
+          vnode.remove();
         }
       }
     },
     on: function (type, mdfs, fn) {
-      fn = arguments[arguments.length - 1] // mdfs?
-      this.eventMap = this.eventMap || {}
+      fn = arguments[arguments.length - 1]; // mdfs?
+      this.eventMap = this.eventMap || {};
 
-      var key = type + mdfs // click.mdfs.ctrl
-      var handler = this.eventMap[key]
+      var key = type + mdfs; // click.mdfs.ctrl
+      var handler = this.eventMap[key];
       // 保存||更新 handler
-      this.eventMap[key] = fn //旧的fn有旧的闭包
-      if (handler) return
+      this.eventMap[key] = fn; //旧的fn有旧的闭包
+      if (handler) return;
 
       // 首次注册
-      var vnode = this
-      var node = this.node
+      var vnode = this;
+      var node = this.node;
       on(node, type, function (event) {
         // mfds
-        if (mdfs.match(/\.prevent\b/)) event.preventDefault()
-        if (mdfs.match(/\.stop\b/)) event.stopPropagation()
-        if (mdfs.match(/\.self\b/) && event.target != node) return
+        if (mdfs.match(/\.prevent\b/)) event.preventDefault();
+        if (mdfs.match(/\.stop\b/)) event.stopPropagation();
+        if (mdfs.match(/\.self\b/) && event.target != node) return;
 
-        if (mdfs.match(/\.ctrl\b/) && !event.ctrlKey) return
-        if (mdfs.match(/\.alt\b/) && !event.altKey) return
-        if (mdfs.match(/\.shift\b/) && !event.shiftKey) return
-        if (mdfs.match(/\.meta\b/) && !event.metaKey) return
+        if (mdfs.match(/\.ctrl\b/) && !event.ctrlKey) return;
+        if (mdfs.match(/\.alt\b/) && !event.altKey) return;
+        if (mdfs.match(/\.shift\b/) && !event.shiftKey) return;
+        if (mdfs.match(/\.meta\b/) && !event.metaKey) return;
 
-        if (mdfs.match(/\.enter\b/) && event.keyCode != 13) return
+        if (mdfs.match(/\.enter\b/) && event.keyCode != 13) return;
 
-        var m = mdfs.match(/\.(\d+)/)
-        if (m && event.keyCode != m[1]) return
+        var m = mdfs.match(/\.(\d+)/);
+        if (m && event.keyCode != m[1]) return;
 
         // call handler
-        vnode.eventMap[key].call(vnode, event) // vnode.on bind vnode
-      })
+        vnode.eventMap[key].call(vnode, event); // vnode.on bind vnode
+      });
     },
     model: function (obj, key, mdfs, vm) {
-      var vnode = this
-      var node = this.node
-      var value = obj[key]
+      var vnode = this;
+      var node = this.node;
+      var value = obj[key];
 
       // m -> v
       function updateView(i) {
-        var self = this
+        var self = this;
         if (!this._ieDelay && document.readyState != "complete" && i < 5) {
           // ie: 刷新页面表单还保留上次的值
           setTimeout(function () {
-            updateView.call(self, ++i)
-          }, 41)
-          return
+            updateView.call(self, ++i);
+          }, 41);
+          return;
         }
-        this._ieDelay = true
+        this._ieDelay = true;
 
         // checkbox
         if (node.type == "checkbox") {
           // array
           if (value instanceof Array) {
-            var has = includes(value, vnode.property("value"))
-            vnode.property("checked", has)
+            var has = includes(value, vnode.property("value"));
+            vnode.property("checked", has);
           }
           // boolean
           else {
-            vnode.property("checked", value)
+            vnode.property("checked", value);
           }
         }
         // radio
         else if (node.type == "radio") {
-          var eq = vnode.property("value") === value // ==?
-          vnode.property("checked", eq)
+          var eq = vnode.property("value") === value; // ==?
+          vnode.property("checked", eq);
         }
         // select
         else if (node.nodeName.match(/^select$/i)) {
           setTimeout(function () {
             //wait option:value
-            var hasSelected = false
+            var hasSelected = false;
             forEach(node.options, function (option) {
-              var voption = VNode(option)
+              var voption = VNode(option);
 
               // array [multiple]
               if (value instanceof Array) {
-                var bool = includes(value, voption.property("value"))
-                voption.property("selected", bool)
+                var bool = includes(value, voption.property("value"));
+                voption.property("selected", bool);
               }
               // one
               else {
-                vnode.property("value", value)
+                vnode.property("value", value);
 
                 if (voption.property("value") === value) {
                   // ==?
-                  voption.property("selected", true)
-                  hasSelected = true
+                  voption.property("selected", true);
+                  hasSelected = true;
                 } else {
-                  voption.property("selected", false) // !ie
+                  voption.property("selected", false); // !ie
                 }
               }
-            })
+            });
             if (!(value instanceof Array) && !hasSelected) {
               // ie
-              node.selectedIndex = -1
+              node.selectedIndex = -1;
             }
-          }, 1)
+          }, 1);
         }
         // input textarea ..
         else {
           // if ((document.hasFocus && document.hasFocus() )&& document.activeElement == node) return
-          vnode.property("value", value)
+          vnode.property("value", value);
         }
       }
 
-      updateView.call(this, 0)
+      updateView.call(this, 0);
 
       // v -> m
-      var type = "input"
-      if (mdfs.match(".lazy")) type = "change"
-      if (node.type == "checkbox") type = "click"
-      if (node.type == "radio") type = "click"
-      if (node.nodeName.match(/^select$/i)) type = "change"
+      var type = "input";
+      if (mdfs.match(".lazy")) type = "change";
+      if (node.type == "checkbox") type = "click";
+      if (node.type == "radio") type = "click";
+      if (node.nodeName.match(/^select$/i)) type = "change";
 
       this.on(type, ".model", function (e) {
-        var node = this.node
+        var node = this.node;
 
         // checkbox
         if (node.type == "checkbox") {
           // array
           if (value instanceof Array) {
-            var array = value
+            var array = value;
             if (node.checked) {
-              this.propertys.checked = true
-              array.push(this.property("value"))
+              this.propertys.checked = true;
+              array.push(this.property("value"));
             } else {
-              this.propertys.checked = false
-              remove(array, this.property("value"))
+              this.propertys.checked = false;
+              remove(array, this.property("value"));
             }
           } else {
-            obj[key] = this.propertys.checked = node.checked
+            obj[key] = this.propertys.checked = node.checked;
           }
         } else if (node.type == "radio") {
-          node.checked = true // ie7-: 没有name属性无法选中 ![name] -> click false
-          obj[key] = this.property("value")
+          node.checked = true; // ie7-: 没有name属性无法选中 ![name] -> click false
+          obj[key] = this.property("value");
         }
         // select
         else if (node.nodeName.match(/^select$/i)) {
           forEach(node.options, function (option) {
-            var voption = VNode(option)
+            var voption = VNode(option);
             if (value instanceof Array) {
               if (option.selected) {
-                voption.propertys.selected = true
+                voption.propertys.selected = true;
                 if (!includes(value, voption.property("value"))) {
-                  value.push(voption.property("value"))
+                  value.push(voption.property("value"));
                 }
               } else {
-                voption.propertys.selected = false
-                remove(value, voption.property("value"))
+                voption.propertys.selected = false;
+                remove(value, voption.property("value"));
               }
             } else {
               if (option.selected) {
-                vnode.property("value", voption.property("value"))
-                voption.propertys.selected = true
-                obj[key] = voption.property("value")
+                vnode.property("value", voption.property("value"));
+                voption.propertys.selected = true;
+                obj[key] = voption.property("value");
               } else {
-                voption.propertys.selected = false
+                voption.propertys.selected = false;
               }
             }
-          })
+          });
         }
         // input textarea ..
         else {
-          var nodeValue = node.value
+          var nodeValue = node.value;
           if (mdfs.match(".trim")) {
-            nodeValue = trim(nodeValue)
+            nodeValue = trim(nodeValue);
           }
           if (mdfs.match(".number")) {
-            nodeValue = toNumber(nodeValue)
+            nodeValue = toNumber(nodeValue);
           }
-          obj[key] = this.propertys.value = nodeValue
+          obj[key] = this.propertys.value = nodeValue;
         }
 
         // update view
-        vm.$render()
-      })
+        vm.$render();
+      });
     },
     is: function (vm, name) {
-      var vis = this.vis || this
+      var vis = this.vis || this;
       if (!vis.vcomponent) {
-        var slotContents = VNode.getSlotContents(vis.node, vm)
+        var slotContents = VNode.getSlotContents(vis.node, vm);
 
         // new component
-        var options = VM.optionsMap[name]
+        var options = VM.optionsMap[name];
         if (!options) {
           setTimeout(function () {
-            throw name + " is not a component"
-          }, 1)
-          return
+            throw name + " is not a component";
+          }, 1);
+          return;
         }
 
-        options.$slots = slotContents
-        var component = VM(options)
+        options.$slots = slotContents;
+        var component = VM(options);
 
         // vis <-> vcomponent
-        var vcomponent = VNode(component.$el)
-        vcomponent.component = component
-        vis.vcomponent = vcomponent
-        vcomponent.vis = vis
+        var vcomponent = VNode(component.$el);
+        vcomponent.component = component;
+        vis.vcomponent = vcomponent;
+        vcomponent.vis = vis;
 
-        component.$render()
+        component.$render();
 
         // props
         for (var key in vis.propertys) {
-          vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key]
+          vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key];
         }
 
-        extend(component, vis.propertys)
+        extend(component, vis.propertys);
         // slots
-        var slots = VNode.getSlots(vcomponent.node, vm)
+        var slots = VNode.getSlots(vcomponent.node, vm);
         each(slots, function (slot, name) {
-          var content = slotContents[name] || slot.childNodes
-          insertBefore(content, slot)
-          removeChild(slot)
-        })
+          var content = slotContents[name] || slot.childNodes;
+          insertBefore(content, slot);
+          removeChild(slot);
+        });
 
-        component.$created && component.$created()
+        component.$created && component.$created();
 
         // $parent <-> $children
-        component.$parent = vm
-        vm.$children = vm.$children || []
-        vm.$children.push(component)
+        component.$parent = vm;
+        vm.$children = vm.$children || [];
+        vm.$children.push(component);
 
         // $mount && $render
-        component.$mount(vis.node)
+        component.$mount(vis.node);
       }
 
-      var vcomponent = vis.vcomponent
-      var component = vcomponent.component
-    }
-  }
+      var vcomponent = vis.vcomponent;
+      var component = vcomponent.component;
+    },
+  };
 
   //
   // 视图模型： 编译，生成dom，更新dom
   //
   function VM(options) {
     // VM() -> new VM()
-    if (!(this instanceof VM)) return new VM(options)
+    if (!(this instanceof VM)) return new VM(options);
 
     // options
-    options = options || {}
-    this.$options = options
+    options = options || {};
+    this.$options = options;
 
     // data
-    var data = options.data
+    var data = options.data;
     if (typeof options.data == "function") {
-      data = options.data()
+      data = options.data();
     }
-    VM.setData(this, data)
-    this.$data = data
+    VM.setData(this, data);
+    this.$data = data;
 
     // 根据props设置的类型先初始化
     // init props
-    var props = options.props || {}
-    VM.setData(this, VM.resolveProps(props))
+    var props = options.props || {};
+    VM.setData(this, VM.resolveProps(props));
 
     // methods
-    VM.setData(this, options.methods)
+    VM.setData(this, options.methods);
 
     // computed
-    VM.setData(this, options.computed)
+    VM.setData(this, options.computed);
 
     // watch
-    VM.setWatch(this, options.watch)
+    VM.setWatch(this, options.watch);
 
     // slots
     VM.setData(this, {
-      $slots: options.$slots || {}
-    })
+      $slots: options.$slots || {},
+    });
 
     // el
-    var el = getElement(options.el)
+    var el = getElement(options.el);
     if (!options.el && !options.template) {
       // default node
-      el = document.body // ie: !html
+      el = document.body; // ie: !html
     }
 
     // if (el && el.computed) {
@@ -1097,28 +1106,28 @@
     // fix ie8-: <component>
     if (el) {
       // ie8-: component('tag') -> createElement('tag') -> <tag>ok</tag>
-      el.innerHTML = el.innerHTML
+      el.innerHTML = el.innerHTML;
     }
 
     // template
-    var template = options.template || (el ? outerHTML(el) : "<b>^_^</b>")
+    var template = options.template || (el ? outerHTML(el) : "<b>^_^</b>");
     // this.$template = template // @dev
 
     // $el
-    this.$el = el ? el : parseHTML(template)
+    this.$el = el ? el : parseHTML(template);
 
     // compile render
-    this.$forceUpdate = VM.compile(this.$el)
+    this.$forceUpdate = VM.compile(this.$el);
 
     this.$VN = function (uid) {
-      var vnode = VNode.map[uid]
-      return vnode.vcomponent || vnode
-    }
-    this.$vid = incVid()
-    SHOW.vid && this.$el.setAttribute("vid", this.$vid)
+      var vnode = VNode.map[uid];
+      return vnode.vcomponent || vnode;
+    };
+    this.$vid = incVid();
+    SHOW.vid && this.$el.setAttribute("vid", this.$vid);
     this.$render = function (vms) {
-      var renderTimeStart = new Date()
-      var self = this
+      var renderTimeStart = new Date();
+      var self = this;
 
       // timeGap
       // var timeGap = 1000 / 24
@@ -1133,113 +1142,113 @@
       // }
       // this.$render.lastTime = now
 
-      VM.triggerWatch(this)
+      VM.triggerWatch(this);
 
       // component tree updated
-      vms = vms || []
-      if (includes(vms, this)) return
-      vms.push(this.$vm || this) // ||proxy
+      vms = vms || [];
+      if (includes(vms, this)) return;
+      vms.push(this.$vm || this); // ||proxy
 
       // update component tree
 
       // $children.$render
       forEach(this.$children, function ($child) {
-        $child.$render(vms)
-      })
+        $child.$render(vms);
+      });
 
       // update self
-      self.$forceUpdate()
+      self.$forceUpdate();
 
       // $parent
       if (this.$parent) {
-        this.$parent.$render(vms)
+        this.$parent.$render(vms);
       }
 
-      this.$render.renderTime = new Date() - renderTimeStart
-    }
+      this.$render.renderTime = new Date() - renderTimeStart;
+    };
 
-    this.$created = options.created
+    this.$created = options.created;
 
     // first $render
     if (!options.isComponent) {
       // $children.$render
-      this.$created && this.$created()
+      this.$created && this.$created();
       // this.$render()
     }
 
     // 有props 或computed就再更新一下视图
-    ;(props || options.computed) && this.$render()
+    (props || options.computed) && this.$render();
 
     // mount
-    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted)
+    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted);
     // this.$mounted = options.mounted
-    el && this.$mount(el)
+    el && this.$mount(el);
   }
   VM.prototype = {
     queue: [],
     $on: function (event, fn, ctx) {
       if (typeof fn !== "function") {
-        console.error("listener must be a function")
-        return
+        console.error("listener must be a function");
+        return;
       }
 
-      var eventStores = VM.eventStores
-      eventStores[event] = eventStores[event] || []
+      var eventStores = VM.eventStores;
+      eventStores[event] = eventStores[event] || [];
       eventStores[event].push({
         cb: fn,
-        ctx: ctx || this
-      })
+        ctx: ctx || this,
+      });
     },
     $emit: function (event) {
-      var args = [].slice.call(arguments, 1)
-      var self = this
+      var args = [].slice.call(arguments, 1);
+      var self = this;
       function globalEmit() {
-        var eventStores = VM.eventStores
-        var store = eventStores[event]
+        var eventStores = VM.eventStores;
+        var store = eventStores[event];
 
         if (store) {
-          store = store.slice(0)
+          store = store.slice(0);
           for (var i = 0, len = store.length; i < len; i++) {
-            store[i].cb.apply(store[i].ctx, args)
+            store[i].cb.apply(store[i].ctx, args);
           }
         }
       }
       function VNodeEmit() {
-        var vnodeUid = getUid(self.$el)
-        var VNode = self.$VN(vnodeUid)
-        var eventMap = VNode.vis.eventMap
-        var eventCallback = eventMap[event]
-        eventCallback && eventCallback.call(VNode, args)
+        var vnodeUid = getUid(self.$el);
+        var VNode = self.$VN(vnodeUid);
+        var eventMap = VNode.vis.eventMap;
+        var eventCallback = eventMap[event];
+        eventCallback && eventCallback.call(VNode, args);
       }
-      VNodeEmit()
-      globalEmit()
+      VNodeEmit();
+      globalEmit();
     },
     $off: function (event, fn) {
-      var eventStores = VM.eventStores
+      var eventStores = VM.eventStores;
 
       // all
       if (!arguments.length) {
-        eventStores = {}
-        return
+        eventStores = {};
+        return;
       }
 
       // specific event
-      var store = eventStores[event]
-      if (!store) return
+      var store = eventStores[event];
+      if (!store) return;
 
       // remove all handlers
       if (arguments.length === 1) {
-        delete eventStores[event]
-        return
+        delete eventStores[event];
+        return;
       }
 
       // remove specific handler
-      var cb
+      var cb;
       for (var i = 0, len = store.length; i < len; i++) {
-        cb = store[i].cb
+        cb = store[i].cb;
         if (cb === fn) {
-          store.splice(i, 1)
-          break
+          store.splice(i, 1);
+          break;
         }
       }
     },
@@ -1247,13 +1256,13 @@
     $once: function () {},
     $mount: function (el) {
       // mount
-      el.parentNode.replaceChild(this.$el, el)
-      this.$el = el
+      el.parentNode.replaceChild(this.$el, el);
+      this.$el = el;
 
       // mounted
-      this.$mounted && this.$mounted()
-    }
-  }
+      this.$mounted && this.$mounted();
+    },
+  };
   extend(VM, {
     eventStores: {},
     watchStores: {},
@@ -1272,45 +1281,45 @@
             })
             VNode(uid).is('com')
             */
-      var code = ""
+      var code = "";
 
-      scan(node)
+      scan(node);
 
       function scan(node) {
         switch (node.nodeType) {
           case 1: // element
             // <component>
-            var tag = node.nodeName.toLowerCase()
+            var tag = node.nodeName.toLowerCase();
             if (VM.optionsMap[tag]) {
-              node.setAttribute("is", tag)
+              node.setAttribute("is", tag);
             }
 
             // dirs
-            var dirs = VNode.getDirs(node)
+            var dirs = VNode.getDirs(node);
 
-            var vnode = VNode(node)
+            var vnode = VNode(node);
 
             // pre
             if (dirs.pre) {
-              return
+              return;
             }
 
             // for
-            var dir = dirs["for"]
+            var dir = dirs["for"];
             if (dir) {
-              var for_ = dir.exp
-              var item_list = for_.split(/ (?:in|of) /)
-              var list_ = item_list[1]
-              var item_ = item_list[0]
-              var key_ = "$key"
-              var index_ = "$index"
+              var for_ = dir.exp;
+              var item_list = for_.split(/ (?:in|of) /);
+              var list_ = item_list[1];
+              var item_ = item_list[0];
+              var key_ = "$key";
+              var index_ = "$index";
 
-              var item_m = item_.match(/\((.*)\)/) // (item, key, index)
+              var item_m = item_.match(/\((.*)\)/); // (item, key, index)
               if (item_m) {
-                var item_key_index = item_m[1].split(",")
-                item_ = item_key_index[0]
-                key_ = item_key_index[1]
-                index_ = item_key_index[2]
+                var item_key_index = item_m[1].split(",");
+                item_ = item_key_index[0];
+                key_ = item_key_index[1];
+                index_ = item_key_index[2];
               }
               code += strVars(
                 '$THISVM.$VN(@id)["for"]( $THISVM, @list, function( @item, @key, @index ){ ',
@@ -1319,36 +1328,36 @@
                   "@list": list_,
                   "@item": item_,
                   "@key": key_,
-                  "@index": index_
+                  "@index": index_,
                 }
-              )
+              );
             }
             // if
-            var dir = dirs["if"]
+            var dir = dirs["if"];
             if (dir) {
-              vnode.isIf = true // if for insert
+              vnode.isIf = true; // if for insert
               code += strVars('$THISVM.$VN(@id)["if"]( @value, function(){ ', {
                 "@id": vnode.uid,
-                "@value": dir.exp
-              })
+                "@value": dir.exp,
+              });
             }
             // elseif
-            var dir = dirs["elseif"]
+            var dir = dirs["elseif"];
             if (dir) {
               code += strVars(
                 '["elseif"]( $THISVM.$VN(@id), @value, function(){ ',
                 {
                   "@id": vnode.uid,
-                  "@value": dir.exp
+                  "@value": dir.exp,
                 }
-              )
+              );
             }
             // else
-            var dir = dirs["else"]
+            var dir = dirs["else"];
             if (dir) {
               code += strVars('["else"]( $THISVM.$VN(@id), function(){ ', {
-                "@id": vnode.uid
-              })
+                "@id": vnode.uid,
+              });
             }
 
             // dirs
@@ -1363,26 +1372,26 @@
                       "@mdfs": dir.mdfs,
                       "@code": dir.exp.match(/[(=+-]/)
                         ? dir.exp // 语句
-                        : dir.exp + "($event)" // handler
+                        : dir.exp + "($event)", // handler
                     }
-                  )
-                  break
+                  );
+                  break;
                 case "property":
                   code += strVars(
                     '$THISVM.$VN(@id).property("@name", @value)',
                     {
                       "@id": vnode.uid,
                       "@name": attr2prop(dir.arg),
-                      "@value": dir.exp
+                      "@value": dir.exp,
                     }
-                  )
-                  break
+                  );
+                  break;
                 case "ref":
                   code += strVars('$THISVM.$VN(@id).ref($THISVM, "@name")', {
                     "@id": vnode.uid,
-                    "@name": dir.exp
-                  })
-                  break
+                    "@name": dir.exp,
+                  });
+                  break;
                 default:
                   code += strVars(
                     '$THISVM.$VN(@id)["@dir"](@value, "@arg", "@mdfs")',
@@ -1391,23 +1400,23 @@
                       "@dir": dir.name,
                       "@arg": dir.arg,
                       "@mdfs": dir.mdfs,
-                      "@value": dir.exp
+                      "@value": dir.exp,
                     }
-                  )
+                  );
               }
-            })
+            });
 
             // model
             // 放于 :value 后
-            var dir = dirs["model"]
+            var dir = dirs["model"];
             if (dir) {
-              var obj_ = "$THISVM"
-              var key_ = '"' + dir.exp + '"'
+              var obj_ = "$THISVM";
+              var key_ = '"' + dir.exp + '"';
               //                       obj     .key  | ['key' ]
-              var okm = dir.exp.match(/(.+)(?:\.(.+?)|\[(.+?)\])\s*$/)
+              var okm = dir.exp.match(/(.+)(?:\.(.+?)|\[(.+?)\])\s*$/);
               if (okm) {
-                obj_ = okm[1]
-                key_ = okm[2] ? '"' + okm[2] + '"' : okm[3]
+                obj_ = okm[1];
+                key_ = okm[2] ? '"' + okm[2] + '"' : okm[3];
               }
 
               code += strVars(
@@ -1416,9 +1425,9 @@
                   "@id": vnode.uid,
                   "@obj": obj_,
                   "@key": key_,
-                  "@mdfs": dir.mdfs
+                  "@mdfs": dir.mdfs,
                 }
-              )
+              );
             }
 
             // var dir = dirs["slot"]
@@ -1428,78 +1437,78 @@
 
             // is
             // 要放在所有指令最后，等property等指令设置完才能获取数据更新组件
-            var dir = dirs["is"]
+            var dir = dirs["is"];
             if (dir) {
               code += strVars('$THISVM.$VN(@id).is($THISVM, "@name")', {
                 "@id": vnode.uid,
-                "@name": dir.exp
-              })
+                "@name": dir.exp,
+              });
             }
 
             // compile childNodes
-            var childNodes = toArray(node.childNodes)
+            var childNodes = toArray(node.childNodes);
             for (var i = 0; i < childNodes.length; i++) {
-              scan(childNodes[i])
+              scan(childNodes[i]);
             }
 
             // end: for if elseif else
-            if (dirs["for"]) code += "})\n"
-            if (dirs["if"]) code += "})\n"
-            if (dirs["elseif"]) code += "})\n"
-            if (dirs["else"]) code += "})\n"
+            if (dirs["for"]) code += "})\n";
+            if (dirs["if"]) code += "})\n";
+            if (dirs["elseif"]) code += "})\n";
+            if (dirs["else"]) code += "})\n";
 
-            break
+            break;
           case 3: // text
-            var nodeValue = String(node.nodeValue) // ie: null, boolean
+            var nodeValue = String(node.nodeValue); // ie: null, boolean
 
             // {{}}
             if (nodeValue.match("{{")) {
-              var nodeValue = node.nodeValue
-              var arr = nodeValue.split("}}")
-              node.nodeValue = arr.pop()
+              var nodeValue = node.nodeValue;
+              var arr = nodeValue.split("}}");
+              node.nodeValue = arr.pop();
               forEach(arr, function (t_e_) {
-                var t_e = t_e_.split("{{") // text {{ exp
-                var text = t_e[0]
-                var exp = t_e[1]
-                var textNode = createTextNode(text)
-                insertBefore(textNode, node)
+                var t_e = t_e_.split("{{"); // text {{ exp
+                var text = t_e[0];
+                var exp = t_e[1];
+                var textNode = createTextNode(text);
+                insertBefore(textNode, node);
                 isCloneTextNodeAutoConcat &&
-                  insertBefore(createComment("exp:"), node)
+                  insertBefore(createComment("exp:"), node);
                 if (!textNode.nodeValue) {
                   // ie: !''
-                  removeChild(textNode)
+                  removeChild(textNode);
                 }
 
                 // {{ exp }}
-                var expNode = createTextNode(" ") // ie: !''
-                insertBefore(expNode, node)
+                var expNode = createTextNode(" "); // ie: !''
+                insertBefore(expNode, node);
                 isCloneTextNodeAutoConcat &&
-                  insertBefore(createComment("exp;"), node)
+                  insertBefore(createComment("exp;"), node);
 
-                var vexp = VNode(expNode)
+                var vexp = VNode(expNode);
 
                 code += strVars(
                   '$THISVM.$VN(@id).property( "nodeValue", @value )',
                   {
                     "@id": vexp.uid,
-                    "@value": parseFilter(exp)
+                    "@value": parseFilter(exp),
                   }
-                )
-              })
+                );
+              });
               if (!node.nodeValue) {
                 // ie: !''
-                removeChild(node)
+                removeChild(node);
               }
             }
 
-            break
+            break;
         }
       }
 
-      console.log(code, "code")
+      console.log(code, "code");
 
-      var render = Function("var $THISVM=this;with(this){\n" + code + "\n}")
-      return render
+      var render = Function("var $THISVM=this;with(this){\n" + code + "\n}");
+      return render;
     },
     injectFunction: function (vm, fn) {
       var $fn = function () {
@@ -1512,72 +1521,72 @@
         // window.setInterval = 1; setInterval == window.setInterval
         //
         // !a1~aN
-        var setTimeout = window.setTimeout
+        var setTimeout = window.setTimeout;
         window.setTimeout = function (fn, time, a1, a2, a3) {
           return setTimeout(
             VM.injectFunction(vm, function () {
-              fn.apply(this, arguments)
+              fn.apply(this, arguments);
             }),
             time,
             a1,
             a2,
             a3
-          )
-        }
-        var setInterval = window.setInterval
+          );
+        };
+        var setInterval = window.setInterval;
         window.setInterval = function (fn, time, a1, a2, a3) {
           return setInterval(
             VM.injectFunction(vm, function () {
-              fn.apply(this, arguments)
+              fn.apply(this, arguments);
             }),
             time,
             a1,
             a2,
             a3
-          )
-        }
-        var Image = window.Image
+          );
+        };
+        var Image = window.Image;
         window.Image = function (width, height) {
-          var self = new Image(width, height)
+          var self = new Image(width, height);
           setTimeout(function () {
             each(self, function (handler, name) {
               if (name.match(/^on/) && typeof handler == "function") {
                 self[name] = VM.injectFunction(vm, function () {
-                  handler.apply(self, arguments)
-                })
+                  handler.apply(self, arguments);
+                });
               }
-            })
-          }, 1)
-          return self
-        }
-        var XMLHttpRequest = window.XMLHttpRequest || window.ActiveXObject
-        var XHRprototype = XMLHttpRequest.prototype
-        var send = XHRprototype.send
+            });
+          }, 1);
+          return self;
+        };
+        var XMLHttpRequest = window.XMLHttpRequest || window.ActiveXObject;
+        var XHRprototype = XMLHttpRequest.prototype;
+        var send = XHRprototype.send;
         XHRprototype.send = function () {
-          var self = this
+          var self = this;
           each(self, function (handler, name) {
             if (name.match(/^on/) && typeof handler == "function") {
               self[name] = VM.injectFunction(vm, function () {
-                handler.apply(this, arguments)
-              })
+                handler.apply(this, arguments);
+              });
             }
-          })
-          return send && send.apply(this, arguments)
-        }
+          });
+          return send && send.apply(this, arguments);
+        };
 
         // run
-        var rs = fn.apply(vm, arguments)
+        var rs = fn.apply(vm, arguments);
 
         // restore
-        window.setTimeout = setTimeout
-        window.setInterval = setInterval
-        window.Image = Image
-        XMLHttpRequest.prototype.send = send
+        window.setTimeout = setTimeout;
+        window.setInterval = setInterval;
+        window.Image = Image;
+        XMLHttpRequest.prototype.send = send;
 
         // $render
-        vm.$render()
-        return rs
-      }
+        vm.$render();
+        return rs;
+      };
 
       // computed
       if (String(fn).match("return")) {
@@ -1587,124 +1596,117 @@
           $fn.valueOf =
           $fn.v =
             function () {
-              return fn.call(vm)
-            }
+              return fn.call(vm);
+            };
       }
 
-      $fn.fn = fn
-      return $fn
+      $fn.fn = fn;
+      return $fn;
     },
     overwriteFunction: function (vm, fn) {
       // ?? scope
-      var code = fn.toString()
+      var code = fn.toString();
     },
     resolveProps: function (props) {
-      var propsObj = {}
+      var propsObj = {};
       for (var propKey in props) {
-        var propValue = props[propKey]
+        var propValue = props[propKey];
 
         if (typeof propValue == "object") {
           if (hasOwn(propValue, "default")) {
-            propsObj[propKey] = propValue["default"]
+            propsObj[propKey] = propValue["default"];
           } else if (hasOwn(propValue, "type")) {
-            propsObj[propKey] = propValue.type()
+            propsObj[propKey] = propValue.type();
           }
         } else {
-          propsObj[propKey] = propValue()
+          propsObj[propKey] = propValue();
         }
       }
-      return propsObj
+      return propsObj;
     },
     setData: function (vm, data) {
       for (var key in data) {
-        if (!hasOwn(data, key)) continue
-        var item = data[key]
+        if (!hasOwn(data, key)) continue;
+        var item = data[key];
         if (typeof item == "function") {
-          vm[key] = VM.injectFunction(vm, item)
+          vm[key] = VM.injectFunction(vm, item);
         } else {
-          vm[key] = item
+          vm[key] = item;
         }
       }
     },
     setWatch: function (vm, data) {
       for (var key in data) {
-        var item = data[key]
+        var item = data[key];
         if (typeof item == "function") {
           // VM.injectFunction(this, item)
           VM.watchStores[key] = {
             newVal: vm[key],
             oldVal: vm[key],
-            fn: item
-          }
+            fn: item,
+          };
         } else {
           if (item.handler && typeof item.handler == "function") {
             VM.watchStores[key] = {
               newVal: vm[key],
               oldVal: vm[key],
-              fn: item.handler
-            }
+              fn: item.handler,
+            };
             if (item.immediate) {
-              item.handler.call(vm, vm[key], vm[key])
+              item.handler.call(vm, vm[key], vm[key]);
             }
           } else {
-            console.error("watch [" + key + "] handler must be function")
+            console.error("watch [" + key + "] handler must be function");
           }
         }
       }
     },
     triggerWatch: function (vm) {
-      var watchStores = VM.watchStores
+      var watchStores = VM.watchStores;
       for (var key in watchStores) {
-        var newVal = vm[key]
-        var item = watchStores[key]
-        item.oldVal = item.newVal
-        item.newVal = newVal
+        var newVal = vm[key];
+        var item = watchStores[key];
+        item.oldVal = item.newVal;
+        item.newVal = newVal;
 
-        var fn = item.fn
+        var fn = item.fn;
         if (!strictEquals(newVal, item.oldVal)) {
-          fn.call(vm, newVal, item.oldVal)
+          fn.call(vm, newVal, item.oldVal);
         }
       }
-    }
-  })
+    },
+  });
 
   //
   // component
   // VNode().is( name ) -> VM( optionsMap[name] )->$mount()
   //
-  VM.optionsMap = {}
+  VM.optionsMap = {};
   VM.component = function (name, options) {
-    createElement(name) // ie8-: <component>+</component>
-    options.isComponent = true
-    VM.optionsMap[name] = options
-  }
+    createElement(name); // ie8-: <component>+</component>
+    options.isComponent = true;
+    VM.optionsMap[name] = options;
+  };
 
   VM.use = function (plugin) {
-    var installedPlugins = VM._installedPlugins || (VM._installedPlugins = [])
+    var installedPlugins = VM._installedPlugins || (VM._installedPlugins = []);
     if (installedPlugins.indexOf(plugin) > -1) {
-      return this
+      return this;
     }
 
-    var args = toArray(arguments, 1)
-    args.unshift(this)
+    var args = toArray(arguments, 1);
+    args.unshift(this);
     if (typeof plugin.install === "function") {
-      plugin.install.apply(plugin, args)
+      plugin.install.apply(plugin, args);
     } else if (typeof plugin === "function") {
-      plugin.apply(null, args)
+      plugin.apply(null, args);
     }
-    installedPlugins.push(plugin)
-    return this
-  }
-
-  // export
-  VM.VNode = VNode
-  var Ame = VM
-  if (typeof module == "object") {
-    module.exports = Ame
-  } else {
-    window.V = VM
-    window.VM = VM
-    window.Ame = VM
-    window.VNode = VNode // @dev
-  }
-})(window, document)
+    installedPlugins.push(plugin);
+    return this;
+  };
+  return {
+    render: VM,
+    component: VM.component,
+    VNode: VNode,
+  };
+});

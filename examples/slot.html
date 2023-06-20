@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>hello world</title>
-  <script src="../src/ame.js"></script>
+  <script src="../dist/index.js"></script>
 </head>
 
 <body>
@@ -53,7 +53,7 @@
         console.log('子组件mounted', this)
       }
     })
-    var vm = new Ame({
+    var vm = Ame.render({
       el: '#app',
       data: {
         testData: 1
