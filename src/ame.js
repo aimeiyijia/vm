@@ -503,7 +503,7 @@
       function loop(node) {
         forEach(node.children, function (child) {
           var uid = getUid(child);
-          var vnode = vm.$VN(uid);
+          var vnode = VNode.map[uid];
 
           var nodeType = child.getAttribute("node-type");
 
@@ -771,7 +771,7 @@
       function loop(forNode, cloneNode) {
         var uid = VNode.getUid(forNode);
         // save cloneNode
-        uid && VNode(cloneNode, uid); // **!!!**
+        uid && VNode(cloneNode, uid + "." + key); // **!!!**
 
         var forChildNodes = forNode.childNodes;
         var childNodes = cloneNode.childNodes;
@@ -797,7 +797,10 @@
       // this.mark()
       vfor.remove();
 
+      var forKeyPath = vm.$VN.forKeyPath; // **!!!**
       each(list, function (item, key, index) {
+        // clone
+        vm.$VN.forKeyPath = forKeyPath + "." + key; // **!!!**
         var vnode = vfor.clone(key);
         vnode.index = index;
 
@@ -808,6 +811,7 @@
 
         fn(item, key, index);
       });
+      vm.$VN.forKeyPath = forKeyPath; // **!!!**
 
       // remove
       var clones = vfor.clones;
@@ -998,56 +1002,54 @@
     },
     is: function (vm, name) {
       var vis = this.vis || this;
-      if (!vis.vcomponent) {
-        var slotContents = VNode.getSlotContents(vis.node, vm);
+      var slotContents = VNode.getSlotContents(vis.node, vm);
 
-        // new component
-        var options = VM.optionsMap[name];
-        if (!options) {
-          setTimeout(function () {
-            throw name + " is not a component";
-          }, 1);
-          return;
-        }
-
-        options.$slots = slotContents;
-        var component = VM(options);
-
-        // vis <-> vcomponent
-        var vcomponent = VNode(component.$el);
-        vcomponent.component = component;
-        vis.vcomponent = vcomponent;
-        vcomponent.vis = vis;
-
-        component.$render();
-
-        // props
-        for (var key in vis.propertys) {
-          vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key];
-        }
-
-        extend(component, vis.propertys);
-        // slots
-        var slots = VNode.getSlots(vcomponent.node, vm);
-        each(slots, function (slot, name) {
-          var content = slotContents[name] || slot.childNodes;
-          insertBefore(content, slot);
-          removeChild(slot);
-        });
-
-        component.$created && component.$created();
-
-        // $parent <-> $children
-        component.$parent = vm;
-        vm.$children = vm.$children || [];
-        vm.$children.push(component);
-
-        // $mount && $render
-        component.$mount(vis.node);
+      // new component
+      var options = VM.optionsMap[name];
+      if (!options) {
+        setTimeout(function () {
+          throw name + " is not a component";
+        }, 1);
+        return;
       }
+
+      options.$slots = slotContents;
+      var component = VM(options);
+
+      // vis <-> vcomponent
+      var vcomponent = VNode(component.$el);
+      vcomponent.component = component;
+      vis.vcomponent = vcomponent;
+      vcomponent.vis = vis;
+
+      component.$render();
+
+      // props
+      for (var key in vis.propertys) {
+        vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key];
+      }
+
+      extend(component, vis.propertys);
+      // slots
+      var slots = VNode.getSlots(vcomponent.node, vm);
+      each(slots, function (slot, name) {
+        var content = slotContents[name] || slot.childNodes;
+        insertBefore(content, slot);
+        removeChild(slot);
+      });
+
+      component.$created && component.$created();
+
+      // $parent <-> $children
+      component.$parent = vm;
+      vm.$children = vm.$children || [];
+      vm.$children.push(component);
 
       var vcomponent = vis.vcomponent;
       var component = vcomponent.component;
+
+      // $mount && $render
+      component.$mount(vis.node);
     },
   };
 
@@ -1120,11 +1122,12 @@
     this.$forceUpdate = VM.compile(this.$el);
 
     this.$VN = function (uid) {
-      var vnode = VNode.map[uid];
+      var vnode = VNode.map[uid + this.$VN.forKeyPath];
       return vnode.vcomponent || vnode;
     };
     this.$vid = incVid();
     SHOW.vid && this.$el.setAttribute("vid", this.$vid);
+    this.$VN.forKeyPath = "";
     this.$render = function (vms) {
       var renderTimeStart = new Date();
       var self = this;
@@ -1173,11 +1176,11 @@
     if (!options.isComponent) {
       // $children.$render
       this.$created && this.$created();
-      // this.$render()
+      this.$render();
     }
 
     // 有props 或computed就再更新一下视图
-    (props || options.computed) && this.$render();
+    // (options.props || options.computed) && this.$render();
 
     // mount
     this.$mounted = options.mounted && VM.injectFunction(this, options.mounted);
@@ -1504,8 +1507,6 @@
             break;
         }
       }
-
-      console.log(code, "code");
 
       var render = Function("var $THISVM=this;with(this){\n" + code + "\n}");
       return render;

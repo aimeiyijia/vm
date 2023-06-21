@@ -12,15 +12,35 @@
 <body>
 
   <div id="app">
-    <div v-for="item in arr">123 {{ item }}</div>
+    <div v-for="item in arr">
+      <test1>
+        <div v-slot:haha="$slotData">循环插槽 {{ JSON.stringify($slotData) }}</div>
+        <div v-slot:haha1="$slotData">
+          <b>footer</b>
+          <div>{{ item }}</div>
+        </div>
+      </test1>
+    </div>
 
   </div>
 
   <script>
+    Ame.component('test1', {
+      template: '<div><div node-type="slot" name="haha" :test="test"></div><div node-type="slot" name="haha1" :test="test"></div></div>',
+      data: function(){
+        return {
+          test: 1 
+        }
+      },
+      created: function () {
+        console.log('子组件created', this)
+      },
+      
+    })
     var vm = new Ame.render({
       el: '#app',
       data: {
-        arr: [4,5]
+        arr: [4, 5, 6]
       },
       methods: {}
     })

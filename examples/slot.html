@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>hello world</title>
-  <script src="../dist/index.js"></script>
+  <script src="../src/ame.js"></script>
 </head>
 
 <body>
 
   <div id="app" @click="handleTest">
-    <div v-for="item in [1,2,3]">
+    <div v-for="item in [1, 2,3]">
       <list-base>
         <!-- 插值语法必须使用元素包裹一下，不能裸使用 {{ testData }} -->
-        <div>插槽内插值语法：{{ testData }}</div>
+        <div>插槽内插值语法：{{ testData }} item {{ item }} </div>
         <div> default {{ testData }} </div>
         <div v-slot:header="$slotData">
           <b>header</b>
@@ -46,12 +46,8 @@
       created: function () {
         console.log('子组件created', this)
       },
-      mounted: function () {
-        // setInterval(() => {
-        //   this.showDefault = !this.showDefault
-        // }, 2000)
-        console.log('子组件mounted', this)
-      }
+      // 循环插槽与 mounted有冲突
+      mounted: function () {}
     })
     var vm = Ame.render({
       el: '#app',
