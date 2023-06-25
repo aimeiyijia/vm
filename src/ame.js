@@ -1000,9 +1000,10 @@
         vm.$render();
       });
     },
-    is: function (vm, name) {
+    is: function (vm, name, parent) {
       var vis = this.vis || this;
       if (!vis.vcomponent) {
+        console.log(parent, "父节点");
         var slotContents = VNode.getSlotContents(vis.node, vm);
 
         // new component
@@ -1296,10 +1297,9 @@
             VNode(uid).is('com')
             */
       var code = "";
+      scan(node, null);
 
-      scan(node);
-
-      function scan(node) {
+      function scan(node, parentNode) {
         switch (node.nodeType) {
           case 1: // element
             // <component>
@@ -1307,7 +1307,6 @@
             if (VM.optionsMap[tag]) {
               node.setAttribute("is", tag);
             }
-
             // dirs
             var dirs = VNode.getDirs(node);
 
@@ -1452,17 +1451,21 @@
             // compile childNodes
             var childNodes = toArray(node.childNodes);
             for (var i = 0; i < childNodes.length; i++) {
-              scan(childNodes[i]);
+              scan(childNodes[i], node);
             }
-            
+
             // is
             // 要放在所有指令最后，等property等指令设置完才能获取数据更新组件
             var dir = dirs["is"];
             if (dir) {
-              code += strVars('$THISVM.$VN(@id).is($THISVM, "@name")', {
-                "@id": vnode.uid,
-                "@name": dir.exp,
-              });
+              code += strVars(
+                '$THISVM.$VN(@id).is($THISVM, "@name", $THISVM.$VN(@parent))',
+                {
+                  "@id": vnode.uid,
+                  "@name": dir.exp,
+                  "@parent": parentNode && getUid(parentNode),
+                }
+              );
             }
 
             // end: for if elseif else
