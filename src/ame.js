@@ -1023,7 +1023,7 @@
         vis.vcomponent = vcomponent;
         vcomponent.vis = vis;
 
-        component.$render();
+        // component.$render();
 
         // props
         for (var key in vis.propertys) {
@@ -1049,8 +1049,9 @@
 
         var vcomponent = vis.vcomponent;
         var component = vcomponent.component;
-        vis.node.parentNode.replaceChild(component.$el, vis.node);
-        component.$mounted();
+        // vis.node.parentNode.replaceChild(component.$el, vis.node);
+        // component.$mounted();
+        component.$mount(vis.node);
       }
 
       // vis.node.parentNode.replaceChild(this.$el, vis.node);
