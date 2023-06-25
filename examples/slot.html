@@ -54,6 +54,12 @@
       data: {
         testData: 1
       },
+      created: function(){
+        console.log('父组件created', this)
+      },
+      mounted: function(){
+        console.log('父组件mounted', this)
+      },
       methods: {
         handleTest: function () {
           this.testData++

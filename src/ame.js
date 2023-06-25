@@ -1002,54 +1002,63 @@
     },
     is: function (vm, name) {
       var vis = this.vis || this;
-      var slotContents = VNode.getSlotContents(vis.node, vm);
+      if (!vis.vcomponent) {
+        var slotContents = VNode.getSlotContents(vis.node, vm);
 
-      // new component
-      var options = VM.optionsMap[name];
-      if (!options) {
-        setTimeout(function () {
-          throw name + " is not a component";
-        }, 1);
-        return;
+        // new component
+        var options = VM.optionsMap[name];
+        if (!options) {
+          setTimeout(function () {
+            throw name + " is not a component";
+          }, 1);
+          return;
+        }
+
+        options.$slots = slotContents;
+        var component = VM(options);
+
+        // vis <-> vcomponent
+        var vcomponent = VNode(component.$el);
+        vcomponent.component = component;
+        vis.vcomponent = vcomponent;
+        vcomponent.vis = vis;
+
+        component.$render();
+
+        // props
+        for (var key in vis.propertys) {
+          vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key];
+        }
+
+        extend(component, vis.propertys);
+        // slots
+        var slots = VNode.getSlots(vcomponent.node, vm);
+        each(slots, function (slot, name) {
+          var content = slotContents[name] || slot.childNodes;
+          insertBefore(content, slot);
+          removeChild(slot);
+        });
+
+        component.$created && component.$created();
+
+        // $parent <-> $children
+        vm.$VN.forKeyPath = "";
+        component.$parent = vm;
+        vm.$children = vm.$children || [];
+        vm.$children.push(component);
+
+        var vcomponent = vis.vcomponent;
+        var component = vcomponent.component;
+        // console.log(vm, "this vm");
+        // console.log(this, "this");
+        console.log(component.$el, "this $el");
+        vis.node.parentNode.replaceChild(component.$el, vis.node);
+        component.$mounted()
       }
 
-      options.$slots = slotContents;
-      var component = VM(options);
-
-      // vis <-> vcomponent
-      var vcomponent = VNode(component.$el);
-      vcomponent.component = component;
-      vis.vcomponent = vcomponent;
-      vcomponent.vis = vis;
-
-      component.$render();
-
-      // props
-      for (var key in vis.propertys) {
-        vis.propertys[hyphenToCamelCase(key)] = vm[key] || vis.propertys[key];
-      }
-
-      extend(component, vis.propertys);
-      // slots
-      var slots = VNode.getSlots(vcomponent.node, vm);
-      each(slots, function (slot, name) {
-        var content = slotContents[name] || slot.childNodes;
-        insertBefore(content, slot);
-        removeChild(slot);
-      });
-
-      component.$created && component.$created();
-
-      // $parent <-> $children
-      component.$parent = vm;
-      vm.$children = vm.$children || [];
-      vm.$children.push(component);
-
-      var vcomponent = vis.vcomponent;
-      var component = vcomponent.component;
-
+      // vis.node.parentNode.replaceChild(this.$el, vis.node);
       // $mount && $render
-      component.$mount(vis.node);
+      // component.$mount(vis.node);
     },
   };
 
@@ -1170,21 +1179,22 @@
       this.$render.renderTime = new Date() - renderTimeStart;
     };
 
-    this.$created = options.created;
+    this.$created = options.created && VM.injectFunction(this, options.created);
 
     // first $render
     if (!options.isComponent) {
       // $children.$render
       this.$created && this.$created();
-      this.$render();
+      // this.$render();
     }
 
     // 有props 或computed就再更新一下视图
-    // (options.props || options.computed) && this.$render();
+    (options.props || options.computed) && this.$render();
 
     // mount
-    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted);
+
     // this.$mounted = options.mounted
+    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted);
     el && this.$mount(el);
   }
   VM.prototype = {
