@@ -47,7 +47,9 @@
         console.log('子组件created', this)
       },
       // 循环插槽与 mounted有冲突
-      mounted: function () {}
+      mounted: function () {
+        console.log('子组件mounted', this)
+      }
     })
     var vm = Ame.render({
       el: '#app',

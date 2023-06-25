@@ -1049,11 +1049,8 @@
 
         var vcomponent = vis.vcomponent;
         var component = vcomponent.component;
-        // console.log(vm, "this vm");
-        // console.log(this, "this");
-        console.log(component.$el, "this $el");
         vis.node.parentNode.replaceChild(component.$el, vis.node);
-        component.$mounted()
+        component.$mounted();
       }
 
       // vis.node.parentNode.replaceChild(this.$el, vis.node);
@@ -1179,22 +1176,25 @@
       this.$render.renderTime = new Date() - renderTimeStart;
     };
 
-    this.$created = options.created && VM.injectFunction(this, options.created);
+    if (options.created) {
+      this.$created = VM.injectFunction(this, options.created);
+    } else {
+      this.$created = this.$render;
+    }
 
-    // first $render
     if (!options.isComponent) {
-      // $children.$render
       this.$created && this.$created();
-      // this.$render();
     }
 
     // 有props 或computed就再更新一下视图
     (options.props || options.computed) && this.$render();
 
-    // mount
+    if (options.mounted) {
+      this.$mounted = VM.injectFunction(this, options.mounted);
+    } else {
+      this.$mounted = this.$render;
+    }
 
-    // this.$mounted = options.mounted
-    this.$mounted = options.mounted && VM.injectFunction(this, options.mounted);
     el && this.$mount(el);
   }
   VM.prototype = {
