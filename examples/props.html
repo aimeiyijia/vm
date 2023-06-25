@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>hello world</title>
-  <script src="../dist/index.js"></script>
+  <script src="../src/ame.js"></script>
 </head>
 
 <body>
@@ -43,12 +43,12 @@
           return this.b
         }
       },
-      mounted() {
+      mounted: function() {
         console.log('子组件 prop', this.ah.v())
         console.log('子组件', this)
       },
     })
-    var vm = new Ame({
+    var vm = new Ame.render({
       el: '#app',
       data: {
         testProp: '父组件传递的props'

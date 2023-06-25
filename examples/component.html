@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>hello world</title>
+  <script src="../src/ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <div>
+      <test1>
+        <div v-slot:haha>
+          <div>父组件</div>
+          <test2>
+            <div v-slot:haha2>子组件</div>
+          </test2>
+        </div>
+      </test1>
+    </div>
+
+
+  </div>
+
+  <script>
+    Ame.component('test1', {
+      template: '<div><div node-type="slot" name="haha"></div></div>',
+      created() {
+        console.log('组件1created', this)
+      },
+      mounted() {
+        console.log('组件1mounted', this)
+      },
+      data: function () {
+        return {
+          test: 1
+        }
+      }
+    })
+    Ame.component('test2', {
+      template: '<div><div node-type="slot" name="haha2"></div></div>',
+      created() {
+        console.log('组件2created', this)
+      },
+      mounted() {
+        console.log('组件2mounted', this)
+      },
+    })
+    var vm = new Ame.render({
+      el: '#app',
+      data: {
+        arr: [4, 5, 6]
+      },
+      methods: {}
+    })
+  </script>
+</body>
+
+</html>

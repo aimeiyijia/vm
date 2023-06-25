@@ -1449,6 +1449,12 @@
             //   VM._scopedSlots[dir.arg] = dir
             // }
 
+            // compile childNodes
+            var childNodes = toArray(node.childNodes);
+            for (var i = 0; i < childNodes.length; i++) {
+              scan(childNodes[i]);
+            }
+            
             // is
             // 要放在所有指令最后，等property等指令设置完才能获取数据更新组件
             var dir = dirs["is"];
@@ -1457,12 +1463,6 @@
                 "@id": vnode.uid,
                 "@name": dir.exp,
               });
-            }
-
-            // compile childNodes
-            var childNodes = toArray(node.childNodes);
-            for (var i = 0; i < childNodes.length; i++) {
-              scan(childNodes[i]);
             }
 
             // end: for if elseif else
@@ -1518,6 +1518,8 @@
             break;
         }
       }
+
+      console.log(code, "code");
 
       var render = Function("var $THISVM=this;with(this){\n" + code + "\n}");
       return render;
