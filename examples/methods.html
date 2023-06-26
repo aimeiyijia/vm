@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>ame methods</title>
+  <script src="../src/ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app" @click="handleAppClick">
+    <div>当前值：{{ cur }}</div>
+    <div>冒泡事件被触发：{{ stop }}</div>
+    <button @click.stop="handleAdd">click++</button>
+    <button @click="handleMinus">click--</button>
+  </div>
+
+  </div>
+
+  <script>
+    var vm = new Ame.render({
+      el: '#app',
+      data: {
+        cur: 0,
+        stop: 0,
+      },
+      methods: {
+        handleAdd: function (e) {
+          this.cur++
+        },
+        handleMinus: function (e) {
+          this.cur--
+        },
+        handleAppClick: function () {
+          this.stop++
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

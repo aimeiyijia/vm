@@ -1143,7 +1143,7 @@
       var self = this;
 
       // 预防出现死循环或者过度渲染
-      var timeGap = 1000 / 24;
+      var timeGap = 1000 / 100;
       var now = +new Date();
       var lastTime = this.$render.lastTime || 0;
       if (now - lastTime < timeGap) {
