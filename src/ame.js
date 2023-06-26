@@ -1000,10 +1000,10 @@
         vm.$render();
       });
     },
-    is: function (vm, name, parent) {
+    is: function (vm, name, parent, next) {
       var vis = this.vis || this;
       if (!vis.vcomponent) {
-        console.log(parent, "父节点");
+        console.log(vis, "父节点");
         var slotContents = VNode.getSlotContents(vis.node, vm);
 
         // new component
@@ -1042,11 +1042,13 @@
 
         component.$created && component.$created();
 
+        next()
+
         // $parent <-> $children
-        vm.$VN.forKeyPath = "";
-        component.$parent = vm;
-        vm.$children = vm.$children || [];
-        vm.$children.push(component);
+        // vm.$VN.forKeyPath = "";
+        // component.$parent = parent;
+        // parent.$children = parent.$children || [];
+        // parent.$children.push(component);
 
         var vcomponent = vis.vcomponent;
         var component = vcomponent.component;
@@ -1443,23 +1445,12 @@
               );
             }
 
-            // var dir = dirs["slot"]
-            // if (dir) {
-            //   VM._scopedSlots[dir.arg] = dir
-            // }
-
-            // compile childNodes
-            var childNodes = toArray(node.childNodes);
-            for (var i = 0; i < childNodes.length; i++) {
-              scan(childNodes[i], node);
-            }
-
             // is
             // 要放在所有指令最后，等property等指令设置完才能获取数据更新组件
             var dir = dirs["is"];
             if (dir) {
               code += strVars(
-                '$THISVM.$VN(@id).is($THISVM, "@name", $THISVM.$VN(@parent))',
+                '$THISVM.$VN(@id).is($THISVM, "@name", $THISVM.$VN(@parent), function(){',
                 {
                   "@id": vnode.uid,
                   "@name": dir.exp,
@@ -1468,11 +1459,18 @@
               );
             }
 
+            // compile childNodes
+            var childNodes = toArray(node.childNodes);
+            for (var i = 0; i < childNodes.length; i++) {
+              scan(childNodes[i], node);
+            }
+
             // end: for if elseif else
             if (dirs["for"]) code += "})\n";
             if (dirs["if"]) code += "})\n";
             if (dirs["elseif"]) code += "})\n";
             if (dirs["else"]) code += "})\n";
+            if (dirs["is"]) code += "})\n";
 
             break;
           case 3: // text
