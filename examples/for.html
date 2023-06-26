@@ -5,20 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>hello world</title>
+  <title>ame for</title>
   <script src="../src/ame.js"></script>
 </head>
 
 <body>
 
   <div id="app">
-    <div v-for="item in arr">
+    <div v-for="item in arr" :key="item">
+      <div>循环元素：{{ item }}</div>
       <test1>
-        <div v-slot:haha="$slotData">循环插槽 </div>
-        <div v-slot:haha1="$slotData">
-          <b>footer</b>
-          <div>{{ item }}</div>
-        </div>
+        <span v-slot:haha="$slotData">循环插槽 </span>
+        <span v-slot:haha1="$slotData">
+          <div>作用域插槽：{{ JSON.stringify($slotData) }}</div>
+        </span>
       </test1>
     </div>
 
@@ -27,9 +27,9 @@
   <script>
     Ame.component('test1', {
       template: '<div><div node-type="slot" name="haha" :test="test"></div><div node-type="slot" name="haha1" :test="test"></div></div>',
-      data: function(){
+      data: function () {
         return {
-          test: 1 
+          test: 1
         }
       }
     })

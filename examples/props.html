@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>hello world</title>
+  <title>ame props</title>
   <script src="../src/ame.js"></script>
 </head>
 
@@ -13,14 +13,12 @@
 
   <div id="app">
     父组件
-    <list-base :test-prop="testProp" test-prop2="12" a="123"></list-base>
+    <test :test-prop="testProp" test-prop2="12" a="123"></test>
   </div>
 
   <script>
-    console.log(window)
-    Ame.component("base1", { template: `<div>第二个</div>`, })
-    Ame.component("list-base", {
-      template: `<div>{{ testProp }} {{ a }}  <base1></base1>  </div>`,
+    Ame.component("test", {
+      template: `<div>{{ testProp }} {{ a }} {{ b.h }} {{ ah.v().h }}  <base1></base1>  </div>`,
       props: {
         testProp: String,
         'testProp2': String,
@@ -42,10 +40,6 @@
         ah() {
           return this.b
         }
-      },
-      mounted: function() {
-        console.log('子组件 prop', this.ah.v())
-        console.log('子组件', this)
       },
     })
     var vm = new Ame.render({

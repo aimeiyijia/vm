@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>ame if</title>
+  <script src="../src/ame.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <div v-for="item in arr" :key="item" v-if="cur == item">
+      <div>显示元素：{{ item }}</div>
+    </div>
+
+  </div>
+
+  <script>
+    var vm = new Ame.render({
+      el: '#app',
+      data: {
+        arr: [1, 2, 3, 4, 5, 6],
+        cur: 1
+      },
+      mounted: function () {
+        setInterval(function () {
+          this.cur++
+          if (this.cur > 6) {
+            this.cur = 1
+          }
+        }, 500)
+      },
+      methods: {}
+    })
+  </script>
+</body>
+
+</html>

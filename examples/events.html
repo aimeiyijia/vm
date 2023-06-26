@@ -12,13 +12,13 @@
 <body>
 
   <div id="app">
-    主
-    <list-base @test-event="handleTestEvent"></list-base>
+    打开控制台并点击按钮可查看事件的传递
+    <test @test-event="handleTestEvent"></test>
   </div>
 
   <script>
-    Ame.component("list-base", {
-      template: `<div>组件</div>`,
+    Ame.component("test", {
+      template: `<button @click="handleTestEvent">点我</button>`,
       data: function () {
         return {}
       },
@@ -26,18 +26,26 @@
         console.log('子组件mounted', this)
         this.$emit("test-event")
 
-        this.$on('global-event', function(e){
-          console.log(e, 'global-event')
-        })
-
         this.$emit('global-event', [123])
       },
+      methods: {
+        handleTestEvent: function () {
+          this.$emit("test-event")
+
+          this.$emit('global-event', [789])
+        }
+      },
     })
-    var vm = new Ame({
+    var vm = new Ame.render({
       el: '#app',
       data: {},
+      created: function () {
+        this.$on('global-event', function (e) {
+          console.log(e, 'global-event')
+        })
+      },
       methods: {
-        handleTestEvent(){
+        handleTestEvent() {
           console.log('自定义事件被触发')
         }
       },

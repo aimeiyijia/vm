@@ -5,37 +5,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>hello world</title>
-  <script src="../dist/index.js"></script>
+  <title>ame lifecycle</title>
+  <script src="../src/ame.js"></script>
+  <style>
+    .tip {
+      color: rgb(220, 92, 50);
+    }
+  </style>
 </head>
 
 <body>
-
   <div id="app">
     父组件
-    <list-base></list-base>
+    <test-component>子组件
+      <test-component2>子组件2</test-component2>
+      <span class="tip">打开控制台查看父子组件生命周期顺序</span></test-component>
   </div>
 
   <script>
-    Ame.component("list-base", {
-      template: `<div :data="data1">子组件
-          <div :data2="data1"></div>
-        </div>`,
-      data: function () {
-        return {
-          data1: {
-            a: 1
-          }
-        }
-      },
+    Ame.component("test-component", {
+      template: "<div><div node-type='slot'></div></div>",
       created() {
-        console.log('子组件 created', this.data1.a)
+        console.log('子组件 created', this)
       },
       mounted() {
-        console.log('子组件 mounted', this.data1.a)
+        console.log('子组件 mounted', this)
       },
     })
-    var vm = new Ame({
+    Ame.component("test-component2", {
+      template: "<div><div node-type='slot'></div></div>",
+      created() {
+        console.log('子组件2 created', this)
+      },
+      mounted() {
+        console.log('子组件2 mounted', this)
+      },
+    })
+    var vm = new Ame.render({
       el: '#app',
       created() {
         console.log('父组件 created', this)

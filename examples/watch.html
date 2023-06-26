@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>hello world</title>
-  <script src="../dist/index.js"></script>
+  <title>ame watch</title>
+  <script src="../src/ame.js"></script>
 </head>
 
 <body>
@@ -19,7 +19,7 @@
   </div>
 
   <script>
-    var vm = new Ame({
+    var vm = new Ame.render({
       el: '#app',
       data: {
         model: 1,
@@ -42,11 +42,8 @@
           immediate: true
         }
       },
-      mounted() {
-        console.log('this', this)
-      },
       methods: {
-        handleClick() {
+        handleClick: function () {
           this.model++
         }
       }

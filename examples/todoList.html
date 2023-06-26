@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>todo list</title>
-  <script src="../dist/index.js"></script>
+  <script src="../src/ame.js"></script>
   <style>
-    .done{
+    .done {
       color: #aaa;
       text-decoration: line-through
     }
@@ -37,17 +37,17 @@
   </div>
 
   <script>
-    var vm = new Ame({
+    var vm = new Ame.render({
       el: '#app',
       data: {
         input: '',
         list: [
-          {content:'todo1', done:false}
+          { content: 'todo1', done: false }
         ]
       },
       methods: {
         add: function () {
-          vm.list.push({content: vm.input})
+          vm.list.push({ content: vm.input })
           vm.input = ''
         },
         remove: function (index) {

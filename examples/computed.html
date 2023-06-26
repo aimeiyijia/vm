@@ -14,39 +14,26 @@
   <div id="app">
     <button @click="handleClick"> model++ </button> </br>
     model: {{ model }} </br>
-    model2: {{ model2 }} </br>
     testComputed: {{ testComputed.v() }}
   </div>
 
   <script>
-    var vm = new Ame({
+    var vm = new Ame.render({
       el: '#app',
       data: {
-        model: 1,
-        model2: 2
+        model: 1
       },
       computed: {
-        // 不能在computed中写业务逻辑
+        // 不要在computed中写业务逻辑
         testComputed: function testComputed() {
           return `computed：${this.model + 1}`
         }
       },
-      watch: {
-        modelFn() {
-          setTimeout(() => {
-            console.log(this)
-            this.model2 = '变了里面'
-          }, 1000)
-          this.model2 = '变了'
-          console.log('值发生变化')
-        }
-      },
-      mounted() {
-        this.model = 2
-        console.log('this', this)
+      mounted: function () {
+        console.log('mounted：', this)
       },
       methods: {
-        handleClick() {
+        handleClick: function () {
           this.model++
           console.log('testComputed', this.testComputed.v())
         }
