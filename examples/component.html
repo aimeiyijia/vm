@@ -29,10 +29,10 @@
   <script>
     Ame.component('test1', {
       template: '<div><div node-type="slot" name="haha"></div></div>',
-      created() {
+      created: function() {
         console.log('组件1created', this)
       },
-      mounted() {
+      mounted: function() {
         console.log('组件1mounted', this)
       },
       data: function () {
@@ -43,10 +43,10 @@
     })
     Ame.component('test2', {
       template: '<div><div node-type="slot" name="haha2"></div></div>',
-      created() {
+      created: function() {
         console.log('组件2created', this)
       },
-      mounted() {
+      mounted: function() {
         console.log('组件2mounted', this)
       },
     })
@@ -55,10 +55,10 @@
       data: {
         arr: [4, 5, 6]
       },
-      created() {
+      created: function() {
         console.log('父组件created', this)
       },
-      mounted() {
+      mounted: function() {
         console.log('父组件mounted', this)
       },
       methods: {}

@@ -1003,7 +1003,7 @@
     is: function (vm, name, parent, next) {
       var vis = this.vis || this;
       if (!vis.vcomponent) {
-        console.log(vis, "父节点");
+        console.log(parent, "父节点");
         var slotContents = VNode.getSlotContents(vis.node, vm);
 
         // new component
@@ -1042,13 +1042,13 @@
 
         component.$created && component.$created();
 
-        next()
+        next();
 
         // $parent <-> $children
-        // vm.$VN.forKeyPath = "";
-        // component.$parent = parent;
-        // parent.$children = parent.$children || [];
-        // parent.$children.push(component);
+        vm.$VN.forKeyPath = "";
+        component.$parent = parent;
+        parent.$children = parent.$children || [];
+        parent.$children.push(component);
 
         var vcomponent = vis.vcomponent;
         var component = vcomponent.component;
@@ -1166,7 +1166,7 @@
 
       // $children.$render
       forEach(this.$children, function ($child) {
-        $child.$render(vms);
+        $child.$render && $child.$render(vms);
       });
 
       // update self
@@ -1174,7 +1174,7 @@
 
       // $parent
       if (this.$parent) {
-        this.$parent.$render(vms);
+        this.$parent.$render && this.$parent.$render(vms);
       }
 
       this.$render.renderTime = new Date() - renderTimeStart;
