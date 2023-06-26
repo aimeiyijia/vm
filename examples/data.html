@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>ame data</title>
+  <script src="../src/ame.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div>姓名：{{ name }}</div>
+    <div>年龄：{{ name }}</div>
+    <div>高吗：{{ height ? '高': '不高' }}</div>
+    <div>爱好：{{ hobby }}</div>
+    <div>格言：{{ aphorism('出自大明王朝1566') }}</div>
+    <div>详细描述：
+      <div>&emsp;国籍：{{ desc.country }}</div>
+      <div>&emsp;体重：{{ desc.weight }}</div>
+    </div>
+  </div>
+  <script>
+    var vm = new Ame.render({
+      el: '#app',
+      // data可以是对象、也可以是具有返回值的函数
+      data: {
+        // string类型
+        name: 'liuxiaofan',
+        // number类型
+        age: 18,
+        // boolean类型
+        height: false,
+        // object类型
+        desc: {
+          country: '中国',
+          weight: 190 + '斤'
+        },
+        // array类型
+        hobby: ['唱', '跳', 'rap', '篮球'],
+        // function类型
+        aphorism: function (a) {
+          return '思危、思退、思变' + '(' + a + ')'
+        }
+      },
+      // data: function () {
+      //   return {
+      //     // string类型
+      //     name: 'liuxiaofan',
+      //     // number类型
+      //     age: 18,
+      //     // boolean类型
+      //     height: false,
+      //     // object类型
+      //     desc: {
+      //       country: '中国',
+      //       weight: 190 + '斤'
+      //     },
+      //     // array类型
+      //     hobby: ['唱', '跳', 'rap', '篮球'],
+      //     // function类型
+      //     aphorism: function (a) {
+      //       return '思危、思退、思变' + '(' + a + ')'
+      //     }
+      //   }
+      // },
+      created: function () {
+        console.log('创建完成：', this)
+      },
+      mounted: function () {
+        console.log('挂载完成：', this)
+      }
+    })
+  </script>
+</body>
+
+</html>

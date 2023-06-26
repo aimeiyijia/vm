@@ -1142,18 +1142,18 @@
       var renderTimeStart = new Date();
       var self = this;
 
-      // timeGap
-      // var timeGap = 1000 / 24
-      // var now = +new Date()
-      // var lastTime = this.$render.lastTime || 0
-      // if (now - lastTime < timeGap) {
-      //   clearTimeout(this.$render.timer)
-      //   this.$render.timer = setTimeout(function () {
-      //     self.$render(vms)
-      //   }, timeGap)
-      //   return
-      // }
-      // this.$render.lastTime = now
+      // 预防出现死循环或者过度渲染
+      var timeGap = 1000 / 24;
+      var now = +new Date();
+      var lastTime = this.$render.lastTime || 0;
+      if (now - lastTime < timeGap) {
+        clearTimeout(this.$render.timer);
+        this.$render.timer = setTimeout(function () {
+          self.$render(vms);
+        }, timeGap);
+        return;
+      }
+      this.$render.lastTime = now;
 
       VM.triggerWatch(this);
 
@@ -1519,8 +1519,6 @@
             break;
         }
       }
-
-      console.log(code, "code");
 
       var render = Function("var $THISVM=this;with(this){\n" + code + "\n}");
       return render;

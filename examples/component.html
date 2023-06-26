@@ -14,10 +14,10 @@
   <div id="app">
     <div data="123">
       <test1>
-        <div v-slot:haha>
+        <div>
           <div>父组件</div>
           <test2>
-            <div v-slot:haha2>子组件{{ arr }}</div>
+            <div>子组件{{ arr }}</div>
           </test2>
         </div>
       </test1>
@@ -28,7 +28,7 @@
 
   <script>
     Ame.component('test1', {
-      template: '<div><div node-type="slot" name="haha"></div></div>',
+      template: '<div><div node-type="slot"></div><div node-type="slot" name="haha"></div></div>',
       created: function() {
         console.log('组件1created', this)
       },
@@ -42,7 +42,7 @@
       }
     })
     Ame.component('test2', {
-      template: '<div><div node-type="slot" name="haha2"></div></div>',
+      template: '<div><div node-type="slot"></div><div node-type="slot" name="haha2"></div></div>',
       created: function() {
         console.log('组件2created', this)
       },
